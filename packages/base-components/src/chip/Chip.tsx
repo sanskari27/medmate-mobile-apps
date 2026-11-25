@@ -9,6 +9,7 @@ export type ChipProps = {
   selected?: boolean;
   onPress?: () => void;
   disabled?: boolean;
+  selectedColor?: string;
 };
 
 export function Chip({
@@ -16,6 +17,7 @@ export function Chip({
   selected = false,
   onPress,
   disabled = false,
+  selectedColor,
   selectedClass,
   idleClass,
 }: ChipProps & {
@@ -31,7 +33,10 @@ export function Chip({
       onPress={pressHandler(disabled, onPress)}
       className={cn('rounded-pill px-md py-xs', selected ? selectedClass : idleClass)}
     >
-      <Text variant="filterLabel" color={selected ? semantic.action : semantic.text}>
+      <Text
+        variant="filterLabel"
+        color={selected ? (selectedColor ?? semantic.action) : semantic.text}
+      >
         {label}
       </Text>
     </Pressable>

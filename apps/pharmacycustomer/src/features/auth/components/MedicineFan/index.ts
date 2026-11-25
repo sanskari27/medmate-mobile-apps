@@ -1,0 +1,1 @@
+export { MedicineFan } from './MedicineFan';

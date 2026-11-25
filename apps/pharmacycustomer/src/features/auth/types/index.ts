@@ -1,0 +1,1 @@
+export { isOtpMode } from './auth';

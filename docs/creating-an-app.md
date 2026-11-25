@@ -10,8 +10,9 @@ The command writes `apps/consumers/` with:
 - `app.config.ts` reading those files
 - `eas.json` with `development`, `preview`, and `production`
 - NativeWind, Metro, Babel, and Tailwind wired to `@medmate/theme`
-- Outfit font loading in `App.tsx`
-- `App.test.tsx` and a Jest config with a 100% coverage threshold on `App.tsx`
+- Outfit font loading in `src/app/App.tsx`
+- `src/app/App.test.tsx` and a Jest config with a 100% coverage threshold on `src/app/App.tsx`
+- The `src/` tree in [Architecture](architecture.md), with an empty module file in each folder
 - An Nx `project.json` for lint, typecheck, and test
 
 Then install from the repo root so the new workspace package is linked:

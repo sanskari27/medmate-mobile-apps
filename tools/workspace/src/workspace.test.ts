@@ -86,7 +86,7 @@ describe('project files', () => {
       bundleId: string;
     };
     const eas = fs.readFileSync(path.join(root, 'apps/consumers/eas.json'), 'utf8');
-    const app = fs.readFileSync(path.join(root, 'apps/consumers/App.tsx'), 'utf8');
+    const app = fs.readFileSync(path.join(root, 'apps/consumers/src/app/App.tsx'), 'utf8');
     expect(identity).toEqual({
       appName: 'consumers',
       displayName: 'MedMate',
@@ -95,7 +95,8 @@ describe('project files', () => {
     expect(eas).toContain('"autoIncrement": false');
     expect(eas).toContain('"buildType": "apk"');
     expect(app).toContain('identity.displayName');
-    expect(fs.existsSync(path.join(root, 'apps/consumers/App.test.tsx'))).toBe(true);
+    expect(fs.existsSync(path.join(root, 'apps/consumers/src/app/App.test.tsx'))).toBe(true);
+    expect(fs.existsSync(path.join(root, 'apps/consumers/src/features/auth/index.ts'))).toBe(true);
     expect(() => createApp(root, 'consumers', 'Again')).toThrow(/already exists/);
     expect(() => createApp(root, 'Bad', 'Name')).toThrow(/App name/);
     expect(() => createApp(root, 'ok', '  ')).toThrow(/Display name/);
@@ -109,6 +110,9 @@ describe('project files', () => {
     });
     expect(files['README.md']).toContain('medmate-consumers');
     expect(files['app.config.ts']).toContain('identity.bundleId');
+    expect(files['src/index.ts']).toContain('./app/App');
+    expect(files['package.json']).toContain('"main": "src/index.ts"');
+    expect(files['src/features/auth/index.ts']).toContain('export');
   });
 });
 

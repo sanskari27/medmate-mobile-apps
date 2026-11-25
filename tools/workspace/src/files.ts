@@ -16,20 +16,70 @@ export function appFiles(identity: AppIdentity): Record<string, string> {
     'package.json': packageJson(appName),
     'app.config.ts': appConfig(),
     'eas.json': easJson(),
-    'App.tsx': appTsx(),
-    'App.test.tsx': appTest(displayName),
-    'index.ts': indexTs(),
+    'src/index.ts': indexTs(),
+    'src/app/App.tsx': appTsx(),
+    'src/app/App.test.tsx': appTest(displayName),
     'metro.config.js': metroConfig(),
     'babel.config.js': babelConfig(),
     'tailwind.config.ts': tailwindConfig(),
     'global.css': '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n',
-    'nativewind-env.d.ts': '/// <reference types="nativewind/types" />\n',
+    'nativewind-env.d.ts': '/// <reference types="nativewind/types" />\n\ndeclare module \'*.css\';\n',
     'tsconfig.json': tsconfig(),
     'jest.config.cjs': jestConfig(),
     'project.json': projectJson(appName),
     'README.md': readme(appName, displayName, bundleId, scheme),
     '.gitignore': 'node_modules\n.expo\nios\nandroid\ncoverage\n',
+    ...sourceSkeleton(),
   };
+}
+
+function sourceSkeleton(): Record<string, string> {
+  const marker = '/** Module folder. Add the implementation beside this file. */\nexport {};\n';
+  const paths = [
+    'src/app/navigation/index.ts',
+    'src/app/providers/index.ts',
+    'src/app/configuration/index.ts',
+    'src/features/auth/index.ts',
+    'src/features/auth/api/index.ts',
+    'src/features/auth/components/index.ts',
+    'src/features/auth/screens/index.ts',
+    'src/features/auth/hooks/index.ts',
+    'src/features/auth/store/index.ts',
+    'src/features/auth/schemas/index.ts',
+    'src/features/auth/types/index.ts',
+    'src/features/auth/utils/index.ts',
+    'src/features/dashboard/index.ts',
+    'src/features/profile/index.ts',
+    'src/features/notifications/index.ts',
+    'src/features/settings/index.ts',
+    'src/shared/components/index.ts',
+    'src/shared/hooks/index.ts',
+    'src/shared/utils/index.ts',
+    'src/shared/constants/index.ts',
+    'src/shared/types/index.ts',
+    'src/shared/validators/index.ts',
+    'src/shared/styles/index.ts',
+    'src/store/slices/index.ts',
+    'src/store/middleware/index.ts',
+    'src/store/selectors/index.ts',
+    'src/store/listeners/index.ts',
+    'src/store/root.reducer.ts',
+    'src/store/store.ts',
+    'src/store/index.ts',
+    'src/services/api/index.ts',
+    'src/services/storage/index.ts',
+    'src/services/location/index.ts',
+    'src/services/notifications/index.ts',
+    'src/services/permissions/index.ts',
+    'src/services/analytics/index.ts',
+    'src/services/network/index.ts',
+    'src/hooks/index.ts',
+    'src/config/index.ts',
+    'src/constants/index.ts',
+    'src/types/index.ts',
+    'src/utils/index.ts',
+  ];
+  return Object.fromEntries(paths.map((file) => [file, marker]));
 }
 
 function packageJson(appName: string): string {
@@ -38,7 +88,7 @@ function packageJson(appName: string): string {
       name: `@medmate/${appName}`,
       version: '1.0.0',
       private: true,
-      main: 'index.ts',
+      main: 'src/index.ts',
       scripts: {
         start: 'expo start',
         ios: 'expo start --ios',
@@ -138,7 +188,7 @@ function appTsx(): string {
 import { Screen, Text } from '@medmate/base-components';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import identity from './identity.json';
+import identity from '../../identity.json';
 
 export function App() {
   const [fontsLoaded] = useFonts({
@@ -212,9 +262,11 @@ describe('App', () => {
 }
 
 function indexTs(): string {
-  return `import { registerRootComponent } from 'expo';
+  return `import '../global.css';
 
-import { App } from './App';
+import { registerRootComponent } from 'expo';
+
+import { App } from './app/App';
 
 registerRootComponent(App);
 `;
@@ -247,7 +299,7 @@ import { nativeWindPreset } from '@medmate/theme/tailwind-preset';
 
 export default {
   darkMode: 'media',
-  content: ['./App.tsx', './src/**/*.{ts,tsx}', '../../packages/base-components/src/**/*.{ts,tsx}'],
+  content: ['./src/**/*.{ts,tsx}', '../../packages/base-components/src/**/*.{ts,tsx}'],
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   presets: [require('nativewind/preset'), nativeWindPreset],
 } satisfies Config;
@@ -270,8 +322,8 @@ function jestConfig(): string {
   return `/** @type {import('jest').Config} */
 module.exports = {
   preset: 'jest-expo',
-  testMatch: ['<rootDir>/**/*.test.tsx'],
-  collectCoverageFrom: ['App.tsx'],
+  testMatch: ['<rootDir>/**/*.test.ts', '<rootDir>/**/*.test.tsx'],
+  collectCoverageFrom: ['src/app/App.tsx'],
   coverageThreshold: {
     global: { branches: 100, functions: 100, lines: 100, statements: 100 },
   },

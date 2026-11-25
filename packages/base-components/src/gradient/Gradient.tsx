@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from 'react';
-import { View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { gradients, type GradientToken } from '@medmate/theme';
 
@@ -31,16 +31,12 @@ export function Gradient({
   const stops = gradientStops(token, colors);
 
   return (
-    <View style={[{ overflow: 'hidden', borderRadius: radius }, style]}>
-      <Svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 1 1"
-        preserveAspectRatio="none"
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      >
+    <View
+      style={[{ overflow: 'hidden', borderRadius: radius, backgroundColor: stops[0] }, style]}
+    >
+      <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none">
         <Defs>
-          <LinearGradient id={id} x1="0.5" y1="0" x2="0.5" y2="1">
+          <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
             {stops.map((color, index) => (
               <Stop
                 key={`${id}-${index}`}
@@ -50,7 +46,7 @@ export function Gradient({
             ))}
           </LinearGradient>
         </Defs>
-        <Rect x="0" y="0" width="1" height="1" fill={`url(#${id})`} />
+        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
       </Svg>
       {children}
     </View>

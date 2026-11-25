@@ -12,12 +12,12 @@ import { nativeWindPreset } from '@medmate/theme/tailwind-preset';
 
 export default {
   darkMode: 'media',
-  content: ['./App.tsx', '../../packages/base-components/src/**/*.{ts,tsx}'],
+  content: ['./src/**/*.{ts,tsx}', '../../packages/base-components/src/**/*.{ts,tsx}'],
   presets: [require('nativewind/preset'), nativeWindPreset],
 } satisfies Config;
 ```
 
-`global.css` contains the Tailwind directives. Metro uses `withNativeWind`. Babel uses `babel-preset-expo` with `jsxImportSource: 'nativewind'` and `nativewind/babel`. Apps depend on `react-native-css-interop` directly so the JSX runtime resolves under pnpm.
+`global.css` contains the Tailwind directives. The app entry imports it (`import '../global.css'` from `src/index.ts`). Metro only injects those utilities after that import, so a missing import leaves `className` colours unpainted. Metro uses `withNativeWind`. Babel uses `babel-preset-expo` with `jsxImportSource: 'nativewind'` and `nativewind/babel`. Apps depend on `react-native-css-interop` directly so the JSX runtime resolves under pnpm.
 
 Layout, colour, spacing, radius, and type utilities come from the preset (`bg-semantic-page`, `p-lg`, `rounded-card`, `text-ios-body`). Gradients, elevation shadows, and stroked icons are applied from the TypeScript tokens, because Tailwind cannot express them.
 
