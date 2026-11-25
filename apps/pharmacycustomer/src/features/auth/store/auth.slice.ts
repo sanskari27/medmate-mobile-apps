@@ -23,6 +23,8 @@ export type AuthState = {
   phone: string;
   challenge: Challenge;
   error: string | null;
+  /** Set after the shopper accepts terms. A restored session counts as accepted. */
+  termsAccepted: boolean;
 };
 
 type ThunkConfig = {
@@ -37,6 +39,7 @@ export const initialAuthState: AuthState = {
   phone: '',
   challenge: 'idle',
   error: null,
+  termsAccepted: false,
 };
 
 export const sendOtp = createAsyncThunk<OtpMode, void, ThunkConfig>(
@@ -107,6 +110,9 @@ const authSlice = createSlice({
       state.challenge = 'idle';
       state.error = null;
     },
+    termsAccepted(state) {
+      state.termsAccepted = true;
+    },
   },
   extraReducers(builder) {
     builder
@@ -136,6 +142,7 @@ const authSlice = createSlice({
         state.session = action.payload;
         state.challenge = 'idle';
         state.error = null;
+        state.termsAccepted = false;
       })
       .addCase(verifyOtp.rejected, (state, action) => {
         state.challenge = 'codeSent';
@@ -147,16 +154,19 @@ const authSlice = createSlice({
         if (action.payload) {
           state.status = 'signedIn';
           state.session = action.payload;
+          state.termsAccepted = true;
           return;
         }
         state.status = 'signedOut';
         state.session = null;
+        state.termsAccepted = false;
       })
       .addCase(signOut.fulfilled, (state) => {
         state.status = 'signedOut';
         state.session = null;
         state.challenge = 'idle';
         state.error = null;
+        state.termsAccepted = false;
       });
   },
 });
@@ -166,5 +176,5 @@ function rejectedDetail(payload: string | undefined): string {
   return 'Something went wrong';
 }
 
-export const { phoneChanged, challengeReset } = authSlice.actions;
+export const { phoneChanged, challengeReset, termsAccepted } = authSlice.actions;
 export const authReducer = authSlice.reducer;

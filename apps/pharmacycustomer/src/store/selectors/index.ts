@@ -4,4 +4,5 @@ export {
   selectChallenge,
   selectError,
   selectAccountPhone,
+  selectTermsAccepted,
 } from './auth.selectors';

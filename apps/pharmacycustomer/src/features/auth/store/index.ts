@@ -1,1 +1,8 @@
-export { authReducer, sendOtp, verifyOtp, restoreSession, signOut } from './auth.slice';
+export {
+  authReducer,
+  sendOtp,
+  verifyOtp,
+  restoreSession,
+  signOut,
+  termsAccepted,
+} from './auth.slice';

@@ -6,7 +6,12 @@ import { createMemorySessionStore } from '../../services/storage/session-store';
 import { idleAuthApi, renderWithStore, signedOutState } from '../../../test/render';
 import { sessionFixture } from '../../../test/session-fixture';
 import { splashFadeMs } from '../splash/SplashScreen/SplashScreen';
-import { loginHeading, otpHeading } from '../../features/auth/utils/copy';
+import {
+  loginHeading,
+  otpHeading,
+  termsAgree,
+  termsHeadingAccent,
+} from '../../features/auth/utils/copy';
 
 describe('RootNavigator', () => {
   it('keeps the splash while the launch hold is on', () => {
@@ -61,6 +66,8 @@ describe('RootNavigator', () => {
     expect(await view.findByText(otpHeading)).toBeTruthy();
     fireEvent.changeText(view.getByLabelText('Verification code'), '123456');
     fireEvent.press(view.getByLabelText('Verify and continue'));
+    expect(await view.findByText(termsHeadingAccent)).toBeTruthy();
+    fireEvent.press(view.getByLabelText(termsAgree));
     expect(await view.findByText('Your account')).toBeTruthy();
 
     fireEvent.press(view.getByLabelText('Sign out'));

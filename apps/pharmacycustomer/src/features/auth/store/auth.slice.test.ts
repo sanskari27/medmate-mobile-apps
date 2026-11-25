@@ -12,6 +12,7 @@ import {
   restoreSession,
   sendOtp,
   signOut,
+  termsAccepted,
   verifyOtp,
 } from './auth.slice';
 
@@ -69,6 +70,9 @@ describe('auth slice', () => {
     await store.dispatch(verifyOtp('123456'));
     expect(authApi.verifyOtp).toHaveBeenCalledWith('+919876543210', '123456');
     expect(store.getState().auth.status).toBe('signedIn');
+    expect(store.getState().auth.termsAccepted).toBe(false);
+    store.dispatch(termsAccepted());
+    expect(store.getState().auth.termsAccepted).toBe(true);
     expect(await sessionStore.read()).toMatchObject({ accessToken: 'access' });
     expect(selectAccountPhone(store.getState())).toBe('+919876543210');
   });
@@ -94,11 +98,13 @@ describe('auth slice', () => {
     const store = createAppStore({ authApi, sessionStore });
     await store.dispatch(restoreSession());
     expect(store.getState().auth.session?.accessToken).toBe('new');
+    expect(store.getState().auth.termsAccepted).toBe(true);
     expect(await sessionStore.read()).toMatchObject({ accessToken: 'new' });
 
     const empty = harness();
     await empty.store.dispatch(restoreSession());
     expect(empty.store.getState().auth.status).toBe('signedOut');
+    expect(empty.store.getState().auth.termsAccepted).toBe(false);
     expect(selectAccountPhone(empty.store.getState())).toBe('');
 
     const stale = createMemorySessionStore();
@@ -124,6 +130,7 @@ describe('auth slice', () => {
     await store.dispatch(signOut());
     expect(authApi.signOut).toHaveBeenCalledWith('refresh');
     expect(store.getState().auth.status).toBe('signedOut');
+    expect(store.getState().auth.termsAccepted).toBe(false);
     expect(await sessionStore.read()).toBeNull();
 
     const failingStore = createMemorySessionStore();

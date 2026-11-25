@@ -17,6 +17,10 @@ export function selectError(state: RootState) {
   return state.auth.error;
 }
 
+export function selectTermsAccepted(state: RootState) {
+  return state.auth.termsAccepted;
+}
+
 export function selectAccountPhone(state: RootState): string {
   if (!hasSession(state.auth.session)) return '';
   return state.auth.session.account.phone;

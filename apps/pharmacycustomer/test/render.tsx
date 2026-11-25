@@ -35,6 +35,7 @@ export function signedInState(phone = '9876543210'): RootState {
       ...initialAuthState,
       status: 'signedIn',
       phone,
+      termsAccepted: true,
       session: sessionFixture(),
     },
   };

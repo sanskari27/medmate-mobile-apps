@@ -45,4 +45,4 @@ src/
 - `POST /auth/refresh` with `refreshToken` on launch
 - `POST /auth/sign-out` with `refreshToken`
 
-A new customer account is created when the code is accepted. The access token, refresh token, and account are kept in the device secure store (`expo-secure-store`). `EXPO_PUBLIC_API_URL` overrides the API origin. When it is unset, the app calls `http://127.0.0.1:8080`, the local Bruno origin. PIN login is only for an approved pharmacy, so a `pin` response stays on the number screen with an error.
+A new customer account is created when the code is accepted. The shopper then sees Terms and Conditions before the account: age confirmation is required, and offers stay off unless ticked. Declining signs them out. A session restored on launch skips that screen. The access token, refresh token, and account are kept in the device secure store (`expo-secure-store`). `EXPO_PUBLIC_API_URL` overrides the API origin. When it is unset, the app calls `http://127.0.0.1:8080`, the local Bruno origin. PIN login is only for an approved pharmacy, so a `pin` response stays on the number screen with an error.

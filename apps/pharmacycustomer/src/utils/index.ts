@@ -1,1 +1,1 @@
-export { nationalDigits, toE164, formatNational, otpDigits } from './phone';
+export { nationalDigits, toE164, formatNational, formatSignedInPhone, otpDigits } from './phone';

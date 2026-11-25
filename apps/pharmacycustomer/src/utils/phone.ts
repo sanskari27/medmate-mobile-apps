@@ -16,6 +16,14 @@ export function formatNational(digits: string): string {
   return `${digits.slice(0, 5)} ${digits.slice(5)}`;
 }
 
+/** `+91 98765 43210` from national digits or an E.164 number. */
+export function formatSignedInPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  const national = digits.length > 10 ? digits.slice(-10) : digits;
+  if (!national) return phone;
+  return `+91 ${formatNational(national)}`;
+}
+
 /** MedMate login SMS: "200928 is your MedMate login OTP, valid for 10 minutes. …" */
 const loginOtpMessage = /(\d{6}) is your MedMate login OTP\b/;
 
