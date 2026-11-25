@@ -1,0 +1,15 @@
+---
+description: Monorepo layout and dependency direction
+alwaysApply: true
+---
+
+# Monorepo
+
+- pnpm workspaces: `apps/*`, `packages/*`, `tools/*`. Isolated linker.
+- Nx projects: `theme`, `base-components`, `workspace`, plus one project per app.
+- Apps depend on `@medmate/theme` and `@medmate/base-components`.
+- `base-components` depends only on `theme` and React Native peers.
+- Packages do not import from `apps/`.
+- Add apps only with `pnpm create-app`. Do not hand-copy an Expo project.
+- Shared packages export TypeScript source. Do not add a `dist` build.
+- Pin `expo`, `react`, and `react-native` through the pnpm catalog.

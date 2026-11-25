@@ -1,0 +1,27 @@
+{
+  "name": "base-components",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/base-components/src",
+  "projectType": "library",
+  "tags": ["type:ui", "scope:shared"],
+  "implicitDependencies": ["theme"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint packages/base-components --max-warnings 0" },
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p packages/base-components --noEmit" },
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest --config packages/base-components/jest.config.cjs --coverage --forceExit"
+      },
+      "cache": true
+    }
+  }
+}

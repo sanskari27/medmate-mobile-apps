@@ -1,0 +1,9 @@
+{
+  "name": "@medmate/workspace-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Internal commands for creating MedMate apps and bumping versions.",
+  "license": "UNLICENSED",
+  "main": "./src/run.ts",
+  "types": "./src/run.ts"
+}

@@ -1,0 +1,13 @@
+---
+description: EAS profiles and local version files
+globs: "**/{eas.json,app.config.ts,version.json,identity.json}"
+alwaysApply: false
+---
+
+# EAS and versions
+
+- `autoIncrement` stays `false`. Bump with `pnpm bump:version` and `pnpm bump:build`.
+- `appVersionSource` stays `local`.
+- Profiles are `development` (dev client, internal), `preview` (internal, Android apk), and `production`.
+- Do not commit `extra.eas.projectId` secrets, keystores, or provisioning profiles.
+- `version.json` fields are `version`, `iosBuildNumber` (string), and `androidVersionCode` (number).

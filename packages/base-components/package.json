@@ -1,0 +1,40 @@
+{
+  "name": "@medmate/base-components",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MedMate UI kit. Every control reads @medmate/theme and NativeWind.",
+  "license": "UNLICENSED",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "react-native": "./src/index.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@medmate/theme": "workspace:*"
+  },
+  "peerDependencies": {
+    "nativewind": "4.2.7",
+    "react": "19.2.0",
+    "react-native": "0.83.10",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-svg": "15.15.3"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "13.3.3",
+    "@types/node": "^22.20.7",
+    "@types/react": "~19.2.0",
+    "expo": "catalog:",
+    "jest-expo": "~55.0.22",
+    "nativewind": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-svg": "15.15.3",
+    "react-native-worklets": "0.7.4",
+    "react-test-renderer": "catalog:"
+  }
+}

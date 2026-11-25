@@ -1,0 +1,12 @@
+---
+description: Update docs when behaviour changes
+alwaysApply: true
+---
+
+# Docs
+
+- Behaviour for apps, tokens, components, EAS, or scripts is documented under `docs/`.
+- A new component gets a row in `docs/base-components.md`.
+- A new script gets a section in the matching guide and a Cursor command if developers run it.
+- Do not add a second README inside a package when `docs/` already covers it.
+- Keep the index in `docs/README.md` in sync when a guide is added.

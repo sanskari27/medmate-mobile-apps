@@ -1,0 +1,14 @@
+---
+description: TypeScript and React Native conventions
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript and React Native
+
+- Functional components. Export props as a named type when the component is public.
+- Strict TypeScript. Do not use `any`.
+- Expo SDK 55 and React 19. Do not enable Hermes v1 or the removed legacy architecture flag.
+- Prefer theme tokens and NativeWind `className` over inline layout numbers.
+- Accessibility role and label are required on pressable controls.
+- Keep files focused. Re-export public API from the package `index.ts` only.

@@ -1,0 +1,14 @@
+---
+description: Theme tokens and shared UI
+globs: "packages/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Theme and UI
+
+- Colours, spacing, type, radius, and elevation come from `@medmate/theme`.
+- No raw hex in `base-components`. Pass `semantic.*` or a NativeWind class.
+- `Text` variants stay the iOS scale, Material scale, or `typeRoles`.
+- `Button` tones stay `filled`, `forest`, `gold`, `outline`, `muted`, `mint`.
+- Do not put catalogue, cart, order, pharmacy, or care sections in `base-components`.
+- Join classes with `cn` from the theme. Do not add `tailwind-merge`.

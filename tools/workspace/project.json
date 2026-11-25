@@ -1,0 +1,24 @@
+{
+  "name": "workspace",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/workspace/src",
+  "projectType": "library",
+  "tags": ["type:tool"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint tools/workspace --max-warnings 0" },
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p tools/workspace --noEmit" },
+      "cache": true
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "jest --config tools/workspace/jest.config.cjs --coverage" },
+      "cache": true
+    }
+  }
+}

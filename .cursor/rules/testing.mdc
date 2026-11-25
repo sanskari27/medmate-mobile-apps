@@ -1,0 +1,13 @@
+---
+description: 100% Jest coverage and Testing Library
+globs: "**/*.{test,spec}.{ts,tsx}"
+alwaysApply: false
+---
+
+# Tests
+
+- Coverage stays at 100% statements, branches, functions, and lines.
+- Render React Native with `@testing-library/react-native` inside `SafeAreaProvider`.
+- Cover disabled, pressed, and each public variant. Assert the accessibility label.
+- Tool tests write to a temp directory, never to `apps/` in the repo.
+- Do not lower `coverageThreshold` to make a test pass. Cover the branch or delete it.

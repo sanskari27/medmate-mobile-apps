@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "packages/theme" },
+    { "path": "packages/base-components" },
+    { "path": "tools/workspace" }
+  ]
+}

@@ -1,0 +1,13 @@
+---
+description: App name, display name, and in.medmate bundle id
+alwaysApply: true
+---
+
+# Identity
+
+- App name matches `^[a-z][a-z0-9]*$` (example: `consumers`).
+- Bundle id and Android package are `in.medmate.<appName>`.
+- Display name is a separate field and is the only value used as `expo.name`.
+- Every EAS profile uses that same bundle id. Do not add a `.dev` suffix.
+- Read identity from `identity.json`. Do not hard-code a second bundle id.
+- URL scheme is `medmate-<appName>`.
