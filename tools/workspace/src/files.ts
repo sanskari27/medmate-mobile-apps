@@ -55,6 +55,7 @@ function packageJson(appName: string): string {
         'expo-font': '~55.0.8',
         'expo-status-bar': '~55.0.4',
         nativewind: 'catalog:',
+        'react-native-css-interop': '0.2.7',
         react: 'catalog:',
         'react-native': 'catalog:',
         'react-native-reanimated': '4.2.1',
@@ -79,8 +80,8 @@ function packageJson(appName: string): string {
 function appConfig(): string {
   return `import type { ConfigContext, ExpoConfig } from 'expo/config';
 
-import identity from './identity.json';
-import version from './version.json';
+import identity from './identity.json' with { type: 'json' };
+import version from './version.json' with { type: 'json' };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -126,8 +127,16 @@ function easJson(): string {
 }
 
 function appTsx(): string {
-  return `import { useFonts, Outfit_400Regular, Outfit_500Medium, Outfit_600SemiBold, Outfit_700Bold, Outfit_800ExtraBold } from '@expo-google-fonts/outfit';
+  return `import {
+  useFonts,
+  Outfit_400Regular,
+  Outfit_500Medium,
+  Outfit_600SemiBold,
+  Outfit_700Bold,
+  Outfit_800ExtraBold,
+} from '@expo-google-fonts/outfit';
 import { Screen, Text } from '@medmate/base-components';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import identity from './identity.json';
 
@@ -140,18 +149,18 @@ export function App() {
     Outfit_800ExtraBold,
   });
 
-  if (!fontsLoaded) {
-    return (
-      <Screen>
-        <Text>Loading</Text>
-      </Screen>
-    );
-  }
-
   return (
-    <Screen>
-      <Text>{identity.displayName}</Text>
-    </Screen>
+    <SafeAreaProvider>
+      {fontsLoaded ? (
+        <Screen>
+          <Text>{identity.displayName}</Text>
+        </Screen>
+      ) : (
+        <Screen>
+          <Text>Loading</Text>
+        </Screen>
+      )}
+    </SafeAreaProvider>
   );
 }
 `;
@@ -175,7 +184,12 @@ jest.mock('@expo-google-fonts/outfit', () => ({
 
 function renderApp() {
   return render(
-    <SafeAreaProvider>
+    <SafeAreaProvider
+      initialMetrics={{
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: 0, left: 0, right: 0, bottom: 0 },
+      }}
+    >
       <App />
     </SafeAreaProvider>,
   );
@@ -207,7 +221,8 @@ registerRootComponent(App);
 }
 
 function metroConfig(): string {
-  return `const { getDefaultConfig } = require('expo/metro-config');
+  return `/* eslint-disable @typescript-eslint/no-require-imports */
+const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
@@ -230,29 +245,25 @@ function tailwindConfig(): string {
   return `import type { Config } from 'tailwindcss';
 import { nativeWindPreset } from '@medmate/theme/tailwind-preset';
 
-const config: Config = {
+export default {
   darkMode: 'media',
   content: ['./App.tsx', './src/**/*.{ts,tsx}', '../../packages/base-components/src/**/*.{ts,tsx}'],
-  presets: [require('nativewind/preset'), nativeWindPreset as Config],
-};
-
-export default config;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  presets: [require('nativewind/preset'), nativeWindPreset],
+} satisfies Config;
 `;
 }
 
 function tsconfig(): string {
-  return `${JSON.stringify(
-    {
-      extends: '../../tsconfig.base.json',
-      compilerOptions: {
-        jsx: 'react-jsx',
-        types: ['jest', 'nativewind/types'],
-      },
-      include: ['**/*.ts', '**/*.tsx', 'nativewind-env.d.ts'],
-    },
-    null,
-    2,
-  )}\n`;
+  return `{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["jest", "nativewind/types"]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "nativewind-env.d.ts"]
+}
+`;
 }
 
 function jestConfig(): string {
@@ -269,33 +280,34 @@ module.exports = {
 }
 
 function projectJson(appName: string): string {
-  return `${JSON.stringify(
-    {
-      name: appName,
-      projectType: 'application',
-      sourceRoot: `apps/${appName}`,
-      tags: ['type:app'],
-      implicitDependencies: ['theme', 'base-components'],
-      targets: {
-        lint: {
-          executor: 'nx:run-commands',
-          options: { command: `eslint apps/${appName} --max-warnings 0` },
-        },
-        typecheck: {
-          executor: 'nx:run-commands',
-          options: { command: `tsc -p apps/${appName} --noEmit` },
-        },
-        test: {
-          executor: 'nx:run-commands',
-          options: {
-            command: `jest --config apps/${appName}/jest.config.cjs --coverage --forceExit`,
-          },
-        },
-      },
+  return `{
+  "name": "${appName}",
+  "projectType": "application",
+  "sourceRoot": "apps/${appName}",
+  "tags": ["type:app"],
+  "implicitDependencies": ["theme", "base-components"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint apps/${appName} --max-warnings 0"
+      }
     },
-    null,
-    2,
-  )}\n`;
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p apps/${appName} --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest --config apps/${appName}/jest.config.cjs --coverage --forceExit"
+      }
+    }
+  }
+}
+`;
 }
 
 function readme(appName: string, displayName: string, bundleId: string, scheme: string): string {

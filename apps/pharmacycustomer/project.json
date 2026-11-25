@@ -1,0 +1,27 @@
+{
+  "name": "pharmacycustomer",
+  "projectType": "application",
+  "sourceRoot": "apps/pharmacycustomer",
+  "tags": ["type:app"],
+  "implicitDependencies": ["theme", "base-components"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint apps/pharmacycustomer --max-warnings 0"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p apps/pharmacycustomer --noEmit"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest --config apps/pharmacycustomer/jest.config.cjs --coverage --forceExit"
+      }
+    }
+  }
+}

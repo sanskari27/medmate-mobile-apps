@@ -25,6 +25,6 @@ Husky runs:
 
 ## CI
 
-[`.github/workflows/quality.yml`](../.github/workflows/quality.yml) runs `pnpm quality` on pull requests and on pushes to `main` and `master`. Node comes from `.nvmrc`.
+[`.github/workflows/quality.yml`](../.github/workflows/quality.yml) runs `pnpm quality` on pull requests and on pushes to `main` and `master`. Node comes from `.nvmrc`. pnpm comes from the `packageManager` field in `package.json`.
 
 Pull requests use [`.github/pull_request_template.md`](../.github/pull_request_template.md). The checklist covers tests, docs, bundle ids, and secrets.

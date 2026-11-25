@@ -17,7 +17,7 @@ export default {
 } satisfies Config;
 ```
 
-`global.css` contains the Tailwind directives. Metro uses `withNativeWind`. Babel uses `babel-preset-expo` with `jsxImportSource: 'nativewind'` and `nativewind/babel`.
+`global.css` contains the Tailwind directives. Metro uses `withNativeWind`. Babel uses `babel-preset-expo` with `jsxImportSource: 'nativewind'` and `nativewind/babel`. Apps depend on `react-native-css-interop` directly so the JSX runtime resolves under pnpm.
 
 Layout, colour, spacing, radius, and type utilities come from the preset (`bg-semantic-page`, `p-lg`, `rounded-card`, `text-ios-body`). Gradients, elevation shadows, and stroked icons are applied from the TypeScript tokens, because Tailwind cannot express them.
 
