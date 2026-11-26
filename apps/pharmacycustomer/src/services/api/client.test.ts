@@ -66,6 +66,31 @@ describe('requestJson', () => {
       Authorization: 'Bearer access',
       'X-Request-Id': 'req-1',
     });
+    expect(fetchImpl.mock.calls[0]?.[1]?.method).toBe('POST');
+  });
+
+  it('reads with GET and updates with PATCH', async () => {
+    const fetchImpl = asFetch(async () => response(200, JSON.stringify({ ok: true })));
+    await requestJson(
+      'http://127.0.0.1:8080',
+      { method: 'GET', path: '/api/v1/customer/addresses', requestId: 'req-get', token: 'access' },
+      fetchImpl,
+    );
+    await requestJson(
+      'http://127.0.0.1:8080',
+      {
+        method: 'PATCH',
+        path: '/api/v1/customer/addresses/1',
+        body: { city: 'Bengaluru' },
+        requestId: 'req-patch',
+        token: 'access',
+      },
+      fetchImpl,
+    );
+    expect(fetchImpl.mock.calls[0]?.[1]?.method).toBe('GET');
+    expect(fetchImpl.mock.calls[0]?.[1]?.body).toBeUndefined();
+    expect(fetchImpl.mock.calls[1]?.[1]?.method).toBe('PATCH');
+    expect(fetchImpl.mock.calls[1]?.[1]?.body).toBe(JSON.stringify({ city: 'Bengaluru' }));
   });
 
   it('accepts an origin without a trailing slash and an empty success body', async () => {

@@ -6,3 +6,10 @@ export {
   selectAccountPhone,
   selectTermsAccepted,
 } from './auth.selectors';
+export {
+  selectAddressError,
+  selectAddressStatus,
+  selectAddresses,
+  selectAwaitingAddressPick,
+  selectSelectedAddress,
+} from './address.selectors';

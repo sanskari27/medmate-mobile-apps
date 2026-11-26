@@ -1,15 +1,19 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
-  - 'tools/*'
+  - apps/*
+  - packages/*
+  - tools/*
 
 catalog:
   expo: ~55.0.32
+  nativewind: 4.2.7
   react: 19.2.0
   react-native: 0.83.10
   react-test-renderer: 19.2.0
-  nativewind: 4.2.7
   tailwindcss: 3.4.17
 
 onlyBuiltDependencies:
   - nx
+
+# Xcode 27 keeps DeviceHub.app inside Xcode.app on the external SSD and no longer ships Simulator.app.
+patchedDependencies:
+  '@expo/cli@55.0.37': patches/@expo__cli@55.0.37.patch

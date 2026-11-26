@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 
 import { createMemorySessionStore } from '../../../services/storage/session-store';
 import { createAppStore } from '../../../store/store';
-import { idleAuthApi, signedOutState, storeWrapper } from '../../../../test/render';
+import { idleAuthApi, signedOutState, storeWrapper, testExtra } from '../../../../test/render';
 import { useLogin } from './useLogin';
 
 describe('useLogin', () => {
@@ -17,7 +17,7 @@ describe('useLogin', () => {
       ),
     });
     const store = createAppStore(
-      { authApi, sessionStore: createMemorySessionStore() },
+      testExtra(authApi, createMemorySessionStore()),
       signedOutState(),
     );
     const { result } = renderHook(() => useLogin(), { wrapper: storeWrapper(store) });

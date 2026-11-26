@@ -3,7 +3,8 @@ import { act, fireEvent } from '@testing-library/react-native';
 import { RootNavigator } from './RootNavigator';
 import { ApiError } from '../../services/api/problem';
 import { createMemorySessionStore } from '../../services/storage/session-store';
-import { idleAuthApi, renderWithStore, signedOutState } from '../../../test/render';
+import { addressFixture } from '../../../test/address-fixture';
+import { idleAddressApi, idleAuthApi, renderWithStore, signedOutState } from '../../../test/render';
 import { sessionFixture } from '../../../test/session-fixture';
 import { splashFadeMs } from '../splash/SplashScreen/SplashScreen';
 import {
@@ -12,6 +13,18 @@ import {
   termsAgree,
   termsHeadingAccent,
 } from '../../features/auth/utils/copy';
+import {
+  addAddressLabel,
+  addressHeadingAccent,
+  deliverTo,
+  labelHome,
+  line1Label,
+  line2Label,
+  pincodeLabel,
+  receiverNameLabel,
+  saveAndDeliver,
+  useMyNumber,
+} from '../../features/address/utils/copy';
 
 describe('RootNavigator', () => {
   it('keeps the splash while the launch hold is on', () => {
@@ -68,10 +81,40 @@ describe('RootNavigator', () => {
     fireEvent.press(view.getByLabelText('Verify and continue'));
     expect(await view.findByText(termsHeadingAccent)).toBeTruthy();
     fireEvent.press(view.getByLabelText(termsAgree));
+    expect(await view.findByText(addressHeadingAccent)).toBeTruthy();
+    fireEvent.press(view.getByLabelText(addAddressLabel));
+    fireEvent.changeText(view.getByLabelText(line1Label), 'Flat 302, Sri Sai Residency');
+    fireEvent.changeText(view.getByLabelText(line2Label), '7th Cross, Jayanagar 4th Block');
+    fireEvent.changeText(view.getByLabelText(pincodeLabel), '560011');
+    fireEvent.changeText(view.getByLabelText(receiverNameLabel), 'Priya Sharma');
+    fireEvent.press(view.getByLabelText(useMyNumber));
+    fireEvent.press(view.getByLabelText(saveAndDeliver));
     expect(await view.findByText('Your account')).toBeTruthy();
 
     fireEvent.press(view.getByLabelText('Sign out'));
     expect(await view.findByText(loginHeading)).toBeTruthy();
+  });
+
+  it('stays on the address picker after terms when one address is already selected', async () => {
+    const view = renderWithStore(<RootNavigator />, {
+      authApi: idleAuthApi(),
+      addressApi: idleAddressApi({
+        list: jest.fn(async () => [addressFixture({ selected: true })]),
+      }),
+    });
+    expect(await view.findByText(loginHeading)).toBeTruthy();
+    fireEvent.changeText(view.getByLabelText('Mobile number'), '9876543210');
+    fireEvent.press(view.getByLabelText('Get code'));
+    expect(await view.findByText(otpHeading)).toBeTruthy();
+    fireEvent.changeText(view.getByLabelText('Verification code'), '123456');
+    fireEvent.press(view.getByLabelText('Verify and continue'));
+    expect(await view.findByText(termsHeadingAccent)).toBeTruthy();
+    fireEvent.press(view.getByLabelText(termsAgree));
+    expect(await view.findByText(addressHeadingAccent)).toBeTruthy();
+    expect(view.queryByText('Your account')).toBeNull();
+
+    fireEvent.press(view.getByLabelText(deliverTo(labelHome)));
+    expect(await view.findByText('Your account')).toBeTruthy();
   });
 
   it('opens the account when a saved session still refreshes', async () => {
@@ -80,6 +123,9 @@ describe('RootNavigator', () => {
     const view = renderWithStore(<RootNavigator />, {
       sessionStore,
       authApi: idleAuthApi({ refresh: jest.fn(async () => sessionFixture('restored')) }),
+      addressApi: idleAddressApi({
+        list: jest.fn(async () => [addressFixture({ selected: true })]),
+      }),
     });
     expect(await view.findByText('Your account')).toBeTruthy();
     expect(view.getByText('+919876543210')).toBeTruthy();

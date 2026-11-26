@@ -4,12 +4,16 @@ import {
   isIndianMobile,
   nationalDigits,
   otpDigits,
+  storedNationalDigits,
   toE164,
 } from './phone';
 
 describe('phone', () => {
   it('keeps an Indian mobile and formats it', () => {
     expect(nationalDigits('98ab76543210999')).toBe('9876543210');
+    expect(storedNationalDigits('+91 98450 12345')).toBe('9845012345');
+    expect(storedNationalDigits('98450')).toBe('98450');
+    expect(storedNationalDigits('')).toBe('');
     expect(isIndianMobile('9876543210')).toBe(true);
     expect(isIndianMobile('5876543210')).toBe(false);
     expect(toE164('9876543210')).toBe('+919876543210');

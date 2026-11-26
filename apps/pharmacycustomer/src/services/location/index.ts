@@ -1,2 +1,1 @@
-/** Module folder. Add the implementation beside this file. */
-export {};
+export { readCurrentPin, type CurrentPin } from './current-pin';

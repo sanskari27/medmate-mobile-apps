@@ -3,11 +3,18 @@ import type { ReactElement, ReactNode } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 
+import type { AddressApi } from '../src/features/address/api/address.api';
+import { initialAddressState } from '../src/features/address/store/address.slice';
 import type { AuthApi } from '../src/features/auth/api/auth.api';
-import { initialAuthState, type AuthState } from '../src/features/auth/store/auth.slice';
+import {
+  initialAuthState,
+  type AppExtra,
+  type AuthState,
+} from '../src/features/auth/store/auth.slice';
 import { createMemorySessionStore, type SessionStore } from '../src/services/storage/session-store';
 import type { RootState } from '../src/store/root.reducer';
 import { createAppStore, type AppStore } from '../src/store/store';
+import { addressFixture } from './address-fixture';
 import { sessionFixture } from './session-fixture';
 
 const metrics = {
@@ -25,8 +32,29 @@ export function idleAuthApi(overrides: Partial<AuthApi> = {}): AuthApi {
   };
 }
 
+export function idleAddressApi(overrides: Partial<AddressApi> = {}): AddressApi {
+  return {
+    list: jest.fn(async () => []),
+    create: jest.fn(async () => addressFixture({ selected: true })),
+    update: jest.fn(async () => addressFixture({ selected: true })),
+    select: jest.fn(async () => addressFixture({ selected: true })),
+    ...overrides,
+  };
+}
+
+export function testExtra(
+  authApi: AuthApi,
+  sessionStore: SessionStore,
+  addressApi: AddressApi = idleAddressApi(),
+): AppExtra {
+  return { authApi, sessionStore, addressApi };
+}
+
 export function signedOutState(phone = ''): RootState {
-  return { auth: { ...initialAuthState, status: 'signedOut', phone } };
+  return {
+    auth: { ...initialAuthState, status: 'signedOut', phone },
+    address: initialAddressState,
+  };
 }
 
 export function signedInState(phone = '9876543210'): RootState {
@@ -38,6 +66,7 @@ export function signedInState(phone = '9876543210'): RootState {
       termsAccepted: true,
       session: sessionFixture(),
     },
+    address: initialAddressState,
   };
 }
 
@@ -45,6 +74,7 @@ export function renderWithStore(
   ui: ReactElement,
   options?: {
     authApi?: AuthApi;
+    addressApi?: AddressApi;
     sessionStore?: SessionStore;
     preloadedState?: RootState;
     renderOptions?: RenderOptions;
@@ -52,14 +82,18 @@ export function renderWithStore(
 ) {
   const sessionStore = options?.sessionStore ?? createMemorySessionStore();
   const authApi = options?.authApi ?? idleAuthApi();
-  const store = createAppStore({ authApi, sessionStore }, options?.preloadedState);
+  const addressApi = options?.addressApi ?? idleAddressApi();
+  const store = createAppStore(
+    testExtra(authApi, sessionStore, addressApi),
+    options?.preloadedState,
+  );
   const view = render(
     <SafeAreaProvider initialMetrics={metrics}>
       <Provider store={store}>{ui}</Provider>
     </SafeAreaProvider>,
     options?.renderOptions,
   );
-  return { store, authApi, sessionStore, ...view };
+  return { store, authApi, addressApi, sessionStore, ...view };
 }
 
 export function storeWrapper(store: AppStore) {

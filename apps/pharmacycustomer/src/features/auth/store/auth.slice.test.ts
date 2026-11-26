@@ -3,7 +3,7 @@ import { createMemorySessionStore } from '../../../services/storage/session-stor
 import { selectAccountPhone } from '../../../store/selectors/auth.selectors';
 import { createAppStore } from '../../../store/store';
 import { sessionFixture } from '../../../../test/session-fixture';
-import { idleAuthApi, signedInState } from '../../../../test/render';
+import { idleAuthApi, signedInState, testExtra } from '../../../../test/render';
 import { pinModeMessage } from '../utils/copy';
 import {
   challengeReset,
@@ -19,7 +19,7 @@ import {
 function harness(overrides: Parameters<typeof idleAuthApi>[0] = {}) {
   const sessionStore = createMemorySessionStore();
   const authApi = idleAuthApi(overrides);
-  const store = createAppStore({ authApi, sessionStore });
+  const store = createAppStore(testExtra(authApi, sessionStore));
   return { store, authApi, sessionStore };
 }
 
@@ -95,7 +95,7 @@ describe('auth slice', () => {
     const sessionStore = createMemorySessionStore();
     await sessionStore.write(saved);
     const authApi = idleAuthApi({ refresh: jest.fn(async () => next) });
-    const store = createAppStore({ authApi, sessionStore });
+    const store = createAppStore(testExtra(authApi, sessionStore));
     await store.dispatch(restoreSession());
     expect(store.getState().auth.session?.accessToken).toBe('new');
     expect(store.getState().auth.termsAccepted).toBe(true);
@@ -109,14 +109,16 @@ describe('auth slice', () => {
 
     const stale = createMemorySessionStore();
     await stale.write(saved);
-    const rejected = createAppStore({
-      authApi: idleAuthApi({
-        refresh: jest.fn(async () => {
-          throw new ApiError(401, 'Unauthorized', 'Session was not accepted');
+    const rejected = createAppStore(
+      testExtra(
+        idleAuthApi({
+          refresh: jest.fn(async () => {
+            throw new ApiError(401, 'Unauthorized', 'Session was not accepted');
+          }),
         }),
-      }),
-      sessionStore: stale,
-    });
+        stale,
+      ),
+    );
     await rejected.dispatch(restoreSession());
     expect(rejected.getState().auth.status).toBe('signedOut');
     expect(await stale.read()).toBeNull();
@@ -126,7 +128,7 @@ describe('auth slice', () => {
     const sessionStore = createMemorySessionStore();
     await sessionStore.write(sessionFixture());
     const authApi = idleAuthApi();
-    const store = createAppStore({ authApi, sessionStore }, signedInState());
+    const store = createAppStore(testExtra(authApi, sessionStore), signedInState());
     await store.dispatch(signOut());
     expect(authApi.signOut).toHaveBeenCalledWith('refresh');
     expect(store.getState().auth.status).toBe('signedOut');
@@ -135,14 +137,14 @@ describe('auth slice', () => {
 
     const failingStore = createMemorySessionStore();
     const failing = createAppStore(
-      {
-        authApi: idleAuthApi({
+      testExtra(
+        idleAuthApi({
           signOut: jest.fn(async () => {
             throw new Error('offline');
           }),
         }),
-        sessionStore: failingStore,
-      },
+        failingStore,
+      ),
       signedInState(),
     );
     await failing.dispatch(signOut());

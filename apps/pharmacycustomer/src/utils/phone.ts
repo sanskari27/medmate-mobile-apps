@@ -7,6 +7,13 @@ export function nationalDigits(value: string): string {
   return value.replace(/\D/g, '').slice(0, 10);
 }
 
+/** Last 10 digits of a typed number or `+91` value. */
+export function storedNationalDigits(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length <= 10) return digits;
+  return digits.slice(-10);
+}
+
 export function toE164(digits: string): string {
   return `+91${digits}`;
 }

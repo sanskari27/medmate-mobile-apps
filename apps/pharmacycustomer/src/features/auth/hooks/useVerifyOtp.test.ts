@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react-native';
 
 import { createMemorySessionStore } from '../../../services/storage/session-store';
 import { createAppStore } from '../../../store/store';
-import { idleAuthApi, signedOutState, storeWrapper } from '../../../../test/render';
+import { idleAuthApi, signedOutState, storeWrapper, testExtra } from '../../../../test/render';
 import { useVerifyOtp } from './useVerifyOtp';
 
 describe('useVerifyOtp', () => {
@@ -24,7 +24,7 @@ describe('useVerifyOtp', () => {
       ),
     });
     const store = createAppStore(
-      { authApi, sessionStore: createMemorySessionStore() },
+      testExtra(authApi, createMemorySessionStore()),
       signedOutState('9876543210'),
     );
     const { result } = renderHook(() => useVerifyOtp(), { wrapper: storeWrapper(store) });

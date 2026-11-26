@@ -1,8 +1,11 @@
 import { ApiError, errorDetail, problemDetail } from './problem';
 
+export type JsonMethod = 'GET' | 'POST' | 'PATCH';
+
 export type JsonRequest = {
   path: string;
-  body: unknown;
+  method?: JsonMethod;
+  body?: unknown;
   token?: string;
   requestId: string;
   empty?: boolean;
@@ -21,12 +24,13 @@ export async function requestJson(
   if (request.token) headers.Authorization = `Bearer ${request.token}`;
 
   const root = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const method = request.method ?? 'POST';
   let response: Response;
   try {
     response = await fetchImpl(`${root}${request.path}`, {
-      method: 'POST',
+      method,
       headers,
-      body: JSON.stringify(request.body),
+      body: method === 'GET' ? undefined : JSON.stringify(request.body),
     });
   } catch (error) {
     throw new ApiError(0, 'Network', errorDetail(error));

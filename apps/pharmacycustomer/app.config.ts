@@ -28,6 +28,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: identity.bundleId,
     versionCode: version.androidVersionCode,
   },
-  plugins: ['expo-font', ['expo-secure-store', { faceIDPermission: false }]],
+  plugins: [
+    'expo-font',
+    ['expo-secure-store', { faceIDPermission: false }],
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'MedMate uses your location to pin the delivery spot for the rider while the app is open.',
+      },
+    ],
+  ],
   extra: {},
 });

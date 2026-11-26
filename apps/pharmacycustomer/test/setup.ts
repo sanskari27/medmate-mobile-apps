@@ -9,6 +9,11 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+jest.mock('expo-location', () => ({
+  requestForegroundPermissionsAsync: jest.fn(async () => ({ status: 'denied' })),
+  getCurrentPositionAsync: jest.fn(),
+}));
+
 jest.mock('expo-secure-store', () => {
   const state = jest.requireActual('./secure-store-state') as typeof import('./secure-store-state');
   return {

@@ -5,12 +5,14 @@ import type { SessionStore } from '../../../services/storage/session-store';
 import type { Session } from '../../../types/session';
 import { OTP_LENGTH } from '../../../constants/auth';
 import { isIndianMobile, nationalDigits, toE164 } from '../../../utils/phone';
+import type { AddressApi } from '../../address/api/address.api';
 import type { AuthApi } from '../api/auth.api';
 import { pinModeMessage } from '../utils/copy';
 import type { OtpMode } from '../types/auth';
 
 export type AppExtra = {
   authApi: AuthApi;
+  addressApi: AddressApi;
   sessionStore: SessionStore;
 };
 
