@@ -7,7 +7,15 @@ import {
   validateAddress,
   type AddressDraft,
 } from './address-form';
-import { cityRequired, line1Required, nameRequired, outsideArea, phoneInvalid } from './copy';
+import {
+  cityRequired,
+  line1Required,
+  nameRequired,
+  phoneInvalid,
+  pinRequired,
+  placeUnread,
+  serviceNote,
+} from './copy';
 
 function draft(overrides: Partial<AddressDraft> = {}): AddressDraft {
   return {
@@ -24,7 +32,6 @@ function draft(overrides: Partial<AddressDraft> = {}): AddressDraft {
     dontRingBell: false,
     liftNotWorking: false,
     riderNote: ' ',
-    deliverNow: true,
     pin: null,
     ...overrides,
   };
@@ -46,7 +53,6 @@ describe('address form', () => {
       line1: '',
       landmark: '',
       callOnArrival: true,
-      deliverNow: true,
       pin: null,
     });
     expect(emptyDraft(null, { latitude: 1, longitude: 2 }).pin).toEqual({
@@ -56,8 +62,8 @@ describe('address form', () => {
     const blank = addressFixture({
       landmark: null,
       riderNote: null,
-      latitude: null,
-      longitude: null,
+      latitude: 12.97,
+      longitude: 77.59,
       selected: false,
       callOnArrival: false,
     });
@@ -65,8 +71,7 @@ describe('address form', () => {
       landmark: '',
       riderNote: '',
       callOnArrival: false,
-      deliverNow: false,
-      pin: { latitude: 3, longitude: 4 },
+      pin: { latitude: 12.97, longitude: 77.59 },
       receiverPhone: '9845012345',
     });
     const placed = addressFixture({
@@ -84,39 +89,51 @@ describe('address form', () => {
     });
   });
 
-  it('keeps a pin only when both coordinates are present', () => {
+  it('uses the saved pin, then a detected pin', () => {
     expect(startingPin(null, null)).toBeNull();
     expect(startingPin(null, { latitude: 1, longitude: 2 })).toEqual({ latitude: 1, longitude: 2 });
-    expect(startingPin(addressFixture({ latitude: null, longitude: 2 }), null)).toBeNull();
     expect(
-      startingPin(addressFixture({ latitude: 1, longitude: null }), { latitude: 8, longitude: 9 }),
-    ).toEqual({ latitude: 8, longitude: 9 });
-    expect(startingPin(addressFixture({ latitude: 1, longitude: 2 }), null)).toEqual({
+      startingPin(addressFixture({ latitude: 1, longitude: 2 }), { latitude: 8, longitude: 9 }),
+    ).toEqual({
       latitude: 1,
       longitude: 2,
     });
   });
 
   it('checks the fields the rider needs', () => {
-    expect(validateAddress(draft({ line1: ' ', line2: '', city: '', pincode: '400', receiverName: '', receiverPhone: '1' }))).toEqual({
+    expect(
+      validateAddress(
+        draft({
+          line1: ' ',
+          line2: '',
+          city: '',
+          pincode: '400',
+          receiverName: '',
+          receiverPhone: '1',
+        }),
+      ),
+    ).toEqual({
       line1: line1Required,
       line2: expect.any(String),
       city: cityRequired,
-      pincode: outsideArea,
+      pincode: serviceNote,
       receiverName: nameRequired,
       receiverPhone: phoneInvalid,
+      pin: pinRequired,
     });
-    expect(validateAddress(draft())).toEqual({});
+    expect(validateAddress(draft({ pincode: '', pin: { latitude: 1, longitude: 2 } })).pincode).toBe(
+      placeUnread,
+    );
+    expect(validateAddress(draft({ pin: { latitude: 1, longitude: 2 } }))).toEqual({});
   });
 
   it('trims optional text and sends the phone in E.164', () => {
-    expect(toAddressInput(draft())).toMatchObject({
+    expect(() => toAddressInput(draft(), true)).toThrow(pinRequired);
+    expect(toAddressInput(draft({ pin: { latitude: 1, longitude: 2 } }), true)).toMatchObject({
       landmark: null,
       riderNote: null,
-      pincode: '560011',
-      receiverPhone: '+919845012345',
-      latitude: null,
-      longitude: null,
+      latitude: 1,
+      longitude: 2,
       selected: true,
     });
     expect(
@@ -124,13 +141,15 @@ describe('address form', () => {
         draft({
           landmark: ' Temple ',
           riderNote: ' Ring ',
-          deliverNow: false,
           pin: { latitude: 1, longitude: 2 },
         }),
+        false,
       ),
     ).toMatchObject({
       landmark: 'Temple',
       riderNote: 'Ring',
+      pincode: '560011',
+      receiverPhone: '+919845012345',
       latitude: 1,
       longitude: 2,
       selected: false,

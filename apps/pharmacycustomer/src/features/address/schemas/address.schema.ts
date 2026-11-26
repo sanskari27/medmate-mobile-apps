@@ -24,8 +24,8 @@ function readAddress(value: unknown): Address {
     landmark: readNullableString(value, 'landmark'),
     city: readString(value, 'city'),
     pincode: readString(value, 'pincode'),
-    latitude: readNullableNumber(value, 'latitude'),
-    longitude: readNullableNumber(value, 'longitude'),
+    latitude: readNumber(value, 'latitude'),
+    longitude: readNumber(value, 'longitude'),
     receiverName: readString(value, 'receiverName'),
     receiverPhone: readString(value, 'receiverPhone'),
     callOnArrival: readBoolean(value, 'callOnArrival'),
@@ -61,9 +61,8 @@ function readNullableString(record: Record<string, unknown>, key: string): strin
   return value;
 }
 
-function readNullableNumber(record: Record<string, unknown>, key: string): number | null {
+function readNumber(record: Record<string, unknown>, key: string): number {
   const value = record[key];
-  if (value === null) return null;
   if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error(rejected);
   return value;
 }

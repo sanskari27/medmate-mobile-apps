@@ -27,7 +27,6 @@ import {
   deliverTo,
   detectLabel,
   savedAddressesLabel,
-  serviceNote,
   useLocationBody,
   useLocationTitle,
 } from '../../utils/copy';
@@ -100,12 +99,6 @@ export function AddressListScreen({ onCreate, onEdit }: AddressListScreenProps) 
                 + {addAddressLabel}
               </Text>
             </Pressable>
-          </View>
-          <View style={styles.note}>
-            <Icon name="info" size={16} color={semantic.textMuted} />
-            <Text variant="caption1" color={semantic.textMuted} style={styles.noteCopy}>
-              {serviceNote}
-            </Text>
           </View>
           {error ? (
             <Text variant="footnote" color={semantic.danger} style={styles.error}>

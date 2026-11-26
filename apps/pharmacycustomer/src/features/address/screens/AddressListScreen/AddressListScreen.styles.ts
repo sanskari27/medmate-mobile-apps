@@ -79,7 +79,5 @@ export const addressListStyles = StyleSheet.create({
     borderColor: mint[300],
     backgroundColor: neutral.surface,
   },
-  note: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
-  noteCopy: { flex: 1 },
   error: { textAlign: 'center' },
 });

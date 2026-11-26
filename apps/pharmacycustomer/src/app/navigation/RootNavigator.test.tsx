@@ -1,5 +1,6 @@
-import { act, fireEvent } from '@testing-library/react-native';
+import { act, fireEvent, waitFor } from '@testing-library/react-native';
 
+import { pinMapTestId } from '../../features/address/components/PinMap/pin-map';
 import { RootNavigator } from './RootNavigator';
 import { ApiError } from '../../services/api/problem';
 import { createMemorySessionStore } from '../../services/storage/session-store';
@@ -20,7 +21,6 @@ import {
   labelHome,
   line1Label,
   line2Label,
-  pincodeLabel,
   receiverNameLabel,
   saveAndDeliver,
   useMyNumber,
@@ -85,9 +85,19 @@ describe('RootNavigator', () => {
     fireEvent.press(view.getByLabelText(addAddressLabel));
     fireEvent.changeText(view.getByLabelText(line1Label), 'Flat 302, Sri Sai Residency');
     fireEvent.changeText(view.getByLabelText(line2Label), '7th Cross, Jayanagar 4th Block');
-    fireEvent.changeText(view.getByLabelText(pincodeLabel), '560011');
     fireEvent.changeText(view.getByLabelText(receiverNameLabel), 'Priya Sharma');
     fireEvent.press(view.getByLabelText(useMyNumber));
+    global.fetch = jest.fn(async () => ({
+      ok: true,
+      json: async () => ({ address: { city: 'Bengaluru', postcode: '560011' } }),
+    })) as typeof fetch;
+    fireEvent(view.getByTestId(pinMapTestId), 'message', {
+      nativeEvent: { data: JSON.stringify({ latitude: 12.95, longitude: 77.61 }) },
+    });
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    await act(async () => {
+      await Promise.resolve();
+    });
     fireEvent.press(view.getByLabelText(saveAndDeliver));
     expect(await view.findByText('Your account')).toBeTruthy();
 
@@ -129,6 +139,8 @@ describe('RootNavigator', () => {
     });
     expect(await view.findByText('Your account')).toBeTruthy();
     expect(view.getByText('+919876543210')).toBeTruthy();
+    fireEvent.press(view.getByLabelText('Sign out'));
+    expect(await view.findByText(loginHeading)).toBeTruthy();
   });
 
   it('returns to login when the saved session is refused', async () => {

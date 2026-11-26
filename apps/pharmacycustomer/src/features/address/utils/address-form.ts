@@ -5,8 +5,10 @@ import {
   line1Required,
   line2Required,
   nameRequired,
-  outsideArea,
   phoneInvalid,
+  pinRequired,
+  placeUnread,
+  serviceNote,
 } from './copy';
 
 export type AddressDraft = {
@@ -23,11 +25,11 @@ export type AddressDraft = {
   dontRingBell: boolean;
   liftNotWorking: boolean;
   riderNote: string;
-  deliverNow: boolean;
   pin: AddressPin | null;
 };
 
-export type AddressField = 'line1' | 'line2' | 'city' | 'pincode' | 'receiverName' | 'receiverPhone';
+export type AddressField =
+  'line1' | 'line2' | 'city' | 'pincode' | 'receiverName' | 'receiverPhone' | 'pin';
 
 export function deliversHere(pincode: string): boolean {
   return /^560\d{3}$/.test(pincode.replace(/\s/g, ''));
@@ -48,15 +50,12 @@ export function emptyDraft(address: Address | null, pin: AddressPin | null): Add
     dontRingBell: address ? address.dontRingBell : false,
     liftNotWorking: address ? address.liftNotWorking : false,
     riderNote: address?.riderNote ?? '',
-    deliverNow: address ? address.selected : true,
     pin: startingPin(address, pin),
   };
 }
 
 export function startingPin(address: Address | null, pin: AddressPin | null): AddressPin | null {
-  if (address?.latitude != null && address.longitude != null) {
-    return { latitude: address.latitude, longitude: address.longitude };
-  }
+  if (address) return { latitude: address.latitude, longitude: address.longitude };
   return pin;
 }
 
@@ -65,13 +64,16 @@ export function validateAddress(draft: AddressDraft): Partial<Record<AddressFiel
   if (!draft.line1.trim()) errors.line1 = line1Required;
   if (!draft.line2.trim()) errors.line2 = line2Required;
   if (!draft.city.trim()) errors.city = cityRequired;
-  if (!deliversHere(draft.pincode)) errors.pincode = outsideArea;
+  if (!draft.pincode.trim()) errors.pincode = placeUnread;
+  else if (!deliversHere(draft.pincode)) errors.pincode = serviceNote;
   if (!draft.receiverName.trim()) errors.receiverName = nameRequired;
   if (!isIndianMobile(nationalDigits(draft.receiverPhone))) errors.receiverPhone = phoneInvalid;
+  if (!draft.pin) errors.pin = pinRequired;
   return errors;
 }
 
-export function toAddressInput(draft: AddressDraft): AddressInput {
+export function toAddressInput(draft: AddressDraft, selected: boolean): AddressInput {
+  if (!draft.pin) throw new Error(pinRequired);
   const landmark = draft.landmark.trim();
   const riderNote = draft.riderNote.trim();
   return {
@@ -81,8 +83,8 @@ export function toAddressInput(draft: AddressDraft): AddressInput {
     landmark: landmark ? landmark : null,
     city: draft.city.trim(),
     pincode: draft.pincode.replace(/\s/g, ''),
-    latitude: draft.pin?.latitude ?? null,
-    longitude: draft.pin?.longitude ?? null,
+    latitude: draft.pin.latitude,
+    longitude: draft.pin.longitude,
     receiverName: draft.receiverName.trim(),
     receiverPhone: `+91${nationalDigits(draft.receiverPhone)}`,
     callOnArrival: draft.callOnArrival,
@@ -90,6 +92,6 @@ export function toAddressInput(draft: AddressDraft): AddressInput {
     dontRingBell: draft.dontRingBell,
     liftNotWorking: draft.liftNotWorking,
     riderNote: riderNote ? riderNote : null,
-    selected: draft.deliverNow,
+    selected,
   };
 }

@@ -13,7 +13,6 @@ import {
   labelHome,
   labelOther,
   labelWork,
-  serviceNote,
 } from '../../utils/copy';
 import { AddressListScreen } from './AddressListScreen';
 
@@ -34,7 +33,6 @@ describe('AddressListScreen', () => {
       preloadedState: ready([]),
     });
     expect(view.getByText(addressHeadingAccent)).toBeTruthy();
-    expect(view.getByText(serviceNote)).toBeTruthy();
     expect(view.getByLabelText('Deliver here')).toBeTruthy();
     fireEvent.press(view.getByLabelText(addAddressLabel));
     expect(onCreate).toHaveBeenCalledWith(null);

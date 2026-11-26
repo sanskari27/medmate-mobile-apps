@@ -1,47 +1,44 @@
+import { brand, elevation, neutral, radii, spacing } from '@medmate/theme';
 import { StyleSheet } from 'react-native';
-import { brand, mint, neutral, radii, spacing } from '@medmate/theme';
 
 export const addressFormStyles = StyleSheet.create({
   root: { flex: 1, backgroundColor: brand.forest },
   header: {
     gap: spacing.sm,
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.xxl,
   },
   nav: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  title: { marginTop: spacing.xs },
   sheet: {
-    flex: 1,
+    flexGrow: 1,
     marginTop: -spacing.lg,
     borderTopLeftRadius: radii.huge,
     borderTopRightRadius: radii.huge,
     backgroundColor: neutral.page,
     overflow: 'hidden',
+    paddingBottom: spacing.huge,
   },
+  form: { flex: 1 },
   content: {
     gap: spacing.lg,
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
   },
-  locationCard: {
+  detect: {
+    position: 'absolute',
+    right: spacing.md,
+    bottom: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radii.xl,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radii.pill,
     backgroundColor: neutral.surface,
     borderWidth: 1,
     borderColor: neutral.line,
+    ...elevation.low,
   },
-  pinTile: {
-    width: 40,
-    height: 40,
-    borderRadius: radii.lg,
-    backgroundColor: mint[100],
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  locationCopy: { flex: 1, gap: spacing.xxs },
   card: {
     gap: spacing.md,
     padding: spacing.lg,
@@ -49,10 +46,6 @@ export const addressFormStyles = StyleSheet.create({
     backgroundColor: neutral.surface,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  row: { flexDirection: 'row', gap: spacing.md },
-  city: { flex: 1.4 },
-  pincode: { flex: 1 },
-  hint: { marginTop: -spacing.sm },
   phoneRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   prefix: { paddingTop: spacing.xl },
   phone: { flex: 1 },

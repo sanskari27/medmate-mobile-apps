@@ -1,13 +1,22 @@
 jest.mock('react-native-safe-area-context', () => {
+  // Loaded inside the factory so the mock stays free of out-of-scope bindings.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require('react') as typeof import('react');
   const inset = { top: 0, right: 0, bottom: 0, left: 0 };
+  const frame = { x: 0, y: 0, width: 390, height: 844 };
   const Pass = ({ children }: { children?: unknown }) => children;
   return {
     SafeAreaProvider: Pass,
     SafeAreaView: Pass,
+    SafeAreaInsetsContext: React.createContext(inset),
+    SafeAreaFrameContext: React.createContext(frame),
     useSafeAreaInsets: () => inset,
-    useSafeAreaFrame: () => ({ x: 0, y: 0, width: 390, height: 844 }),
+    useSafeAreaFrame: () => frame,
+    initialWindowMetrics: { insets: inset, frame },
   };
 });
+
+jest.mock('react-native-webview', () => jest.requireActual('./webview-mock'));
 
 jest.mock('expo-location', () => ({
   requestForegroundPermissionsAsync: jest.fn(async () => ({ status: 'denied' })),

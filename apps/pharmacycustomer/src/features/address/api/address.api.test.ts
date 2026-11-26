@@ -9,8 +9,8 @@ const input: AddressInput = {
   landmark: null,
   city: 'Bengaluru',
   pincode: '560011',
-  latitude: null,
-  longitude: null,
+  latitude: 12.9716,
+  longitude: 77.5946,
   receiverName: 'Priya',
   receiverPhone: '+919845012345',
   callOnArrival: true,
@@ -37,7 +37,8 @@ describe('createAddressApi', () => {
       if (url.endsWith('/addresses') && init?.method === 'GET') {
         return json(200, { addresses: [saved] });
       }
-      if (url.endsWith('/addresses') && init?.method === 'POST') return json(201, { address: saved });
+      if (url.endsWith('/addresses') && init?.method === 'POST')
+        return json(201, { address: saved });
       if (url.endsWith('/addresses/address-1') && init?.method === 'PATCH') {
         return json(200, { address: saved });
       }

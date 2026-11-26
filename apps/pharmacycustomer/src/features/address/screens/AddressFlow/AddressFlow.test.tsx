@@ -1,4 +1,5 @@
 import { fireEvent } from '@testing-library/react-native';
+import { NavigationContainer } from '@react-navigation/native';
 
 import { addressFixture } from '../../../../../test/address-fixture';
 import { renderWithStore, signedInState } from '../../../../../test/render';
@@ -20,30 +21,31 @@ function state(address: AddressState): RootState {
   return { ...signedInState(), address };
 }
 
+function renderFlow(address: AddressState) {
+  return renderWithStore(
+    <NavigationContainer>
+      <AddressFlow />
+    </NavigationContainer>,
+    { preloadedState: state(address) },
+  );
+}
+
 describe('AddressFlow', () => {
   it('shows a loading line, then a failure, then the list and the form', async () => {
-    const loading = renderWithStore(<AddressFlow />, {
-      preloadedState: state({ status: 'loading', items: [], error: null, awaitingPick: false }),
-    });
+    const loading = renderFlow({ status: 'loading', items: [], error: null, awaitingPick: false });
     expect(loading.getByText(addressLoading)).toBeTruthy();
 
-    const idle = renderWithStore(<AddressFlow />, {
-      preloadedState: state({ status: 'idle', items: [], error: null, awaitingPick: false }),
-    });
+    const idle = renderFlow({ status: 'idle', items: [], error: null, awaitingPick: false });
     expect(idle.getByText(addressLoading)).toBeTruthy();
 
-    const blank = renderWithStore(<AddressFlow />, {
-      preloadedState: state({ status: 'failed', items: [], error: null, awaitingPick: false }),
-    });
+    const blank = renderFlow({ status: 'failed', items: [], error: null, awaitingPick: false });
     expect(blank.getByText(addressLoading)).toBeTruthy();
 
-    const view = renderWithStore(<AddressFlow />, {
-      preloadedState: state({
-        status: 'failed',
-        items: [],
-        error: 'Addresses could not be loaded',
-        awaitingPick: false,
-      }),
+    const view = renderFlow({
+      status: 'failed',
+      items: [],
+      error: 'Addresses could not be loaded',
+      awaitingPick: false,
     });
     expect(view.getByText('Addresses could not be loaded')).toBeTruthy();
     fireEvent.press(view.getByLabelText(tryAgain));
@@ -56,13 +58,11 @@ describe('AddressFlow', () => {
   });
 
   it('opens a saved address for editing', () => {
-    const view = renderWithStore(<AddressFlow />, {
-      preloadedState: state({
-        status: 'ready',
-        items: [addressFixture()],
-        error: null,
-        awaitingPick: false,
-      }),
+    const view = renderFlow({
+      status: 'ready',
+      items: [addressFixture()],
+      error: null,
+      awaitingPick: false,
     });
     fireEvent.press(view.getByLabelText(`Edit ${labelHome}`));
     expect(view.getByText(editAddressTitle)).toBeTruthy();

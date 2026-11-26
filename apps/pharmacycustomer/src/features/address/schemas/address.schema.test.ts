@@ -9,8 +9,8 @@ function record(overrides: Record<string, unknown> = {}): Record<string, unknown
     landmark: null,
     city: 'Bengaluru',
     pincode: '560011',
-    latitude: null,
-    longitude: null,
+    latitude: 12.9716,
+    longitude: 77.5946,
     receiverName: 'Priya',
     receiverPhone: '+919845012345',
     callOnArrival: true,
@@ -37,9 +37,19 @@ describe('address schema', () => {
       selected: false,
     });
     expect(parseAddressList({ addresses: [home, work, other] })).toEqual([
-      expect.objectContaining({ label: 'home', landmark: null, latitude: null }),
+      expect.objectContaining({
+        label: 'home',
+        landmark: null,
+        latitude: 12.9716,
+        longitude: 77.5946,
+      }),
       expect.objectContaining({ label: 'work', landmark: 'Temple', riderNote: 'Ring' }),
-      expect.objectContaining({ label: 'other', latitude: 12.93, longitude: 77.58, selected: false }),
+      expect.objectContaining({
+        label: 'other',
+        latitude: 12.93,
+        longitude: 77.58,
+        selected: false,
+      }),
     ]);
     expect(parseAddressResponse({ address: home }).id).toBe('address-1');
   });
@@ -63,6 +73,9 @@ describe('address schema', () => {
       'Address was not accepted',
     );
     expect(() => parseAddressList({ addresses: [record({ landmark: 1 })] })).toThrow(
+      'Address was not accepted',
+    );
+    expect(() => parseAddressList({ addresses: [record({ latitude: null })] })).toThrow(
       'Address was not accepted',
     );
     expect(() => parseAddressList({ addresses: [record({ latitude: 'north' })] })).toThrow(

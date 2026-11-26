@@ -17,8 +17,8 @@ export type Address = {
   landmark: string | null;
   city: string;
   pincode: string;
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
   receiverName: string;
   receiverPhone: string;
   callOnArrival: boolean;
@@ -38,8 +38,8 @@ export type AddressInput = {
   landmark: string | null;
   city: string;
   pincode: string;
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
   receiverName: string;
   receiverPhone: string;
   callOnArrival: boolean;
