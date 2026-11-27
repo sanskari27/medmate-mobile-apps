@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
 import { brand, elevation, radii, semantic, spacing } from '@medmate/theme';
+import { StyleSheet } from 'react-native';
 
 const tabPillHeight = spacing.giant;
 

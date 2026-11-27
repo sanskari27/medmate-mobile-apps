@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
-import { CommonActions } from '@react-navigation/native';
-import type { BottomTabBarProps, BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 import { Text } from '@medmate/base-components';
 import { brand, semantic, spacing } from '@medmate/theme';
+import type { BottomTabBarProps, BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { CommonActions } from '@react-navigation/native';
+import type { ReactNode } from 'react';
+import { Pressable, View } from 'react-native';
 
 import { homeTabBarStyles as styles } from './HomeTabBar.styles';
 
@@ -110,11 +110,11 @@ function TabControl({ route, index, count, focused, accent, options, onPress }: 
   );
 }
 
-export function HomeTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
+export function HomeTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const count = state.routes.length;
 
   return (
-    <View style={[styles.bar, { paddingBottom: insets.bottom + spacing.sm }]}>
+    <View style={[styles.bar, { paddingBottom: spacing.xxl }]}>
       <View style={styles.pill}>
         {state.routes.map((route, index) => {
           if (route.name === accentRoute) return null;
