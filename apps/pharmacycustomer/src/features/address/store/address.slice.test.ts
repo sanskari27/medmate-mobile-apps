@@ -5,7 +5,7 @@ import { addressFixture } from '../../../../test/address-fixture';
 import { idleAddressApi, idleAuthApi, signedInState, testExtra } from '../../../../test/render';
 import { phoneChanged, signOut, termsAccepted, verifyOtp } from '../../auth/store/auth.slice';
 import type { AddressInput } from '../types/address';
-import { chooseAddress, loadAddresses, saveAddress } from './address.slice';
+import { chooseAddress, loadAddresses, reopenAddressPicker, saveAddress } from './address.slice';
 
 const input = {
   label: 'home',
@@ -40,6 +40,9 @@ describe('address slice', () => {
       testExtra(idleAuthApi(), createMemorySessionStore(), addressApi),
       signedInState(),
     );
+
+    store.dispatch(reopenAddressPicker());
+    expect(store.getState().address.awaitingPick).toBe(true);
 
     await store.dispatch(loadAddresses());
     expect(store.getState().address.status).toBe('ready');

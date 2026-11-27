@@ -2,6 +2,7 @@ import { fireEvent, waitFor } from '@testing-library/react-native';
 
 import { renderWithStore, signedInState } from '../../../../../test/render';
 import { initialAddressState } from '../../../address/store/address.slice';
+import { initialHomeState } from '../../../home/store/home.slice';
 import { initialAuthState } from '../../store/auth.slice';
 import { sessionFixture } from '../../../../../test/session-fixture';
 import {
@@ -26,6 +27,7 @@ function pendingTerms() {
       session: sessionFixture(),
     },
     address: initialAddressState,
+    home: initialHomeState,
   };
 }
 
@@ -75,6 +77,7 @@ describe('TermsScreen', () => {
           },
         },
         address: initialAddressState,
+        home: initialHomeState,
       },
     });
     expect(view.queryByText(/Signed in as/)).toBeNull();

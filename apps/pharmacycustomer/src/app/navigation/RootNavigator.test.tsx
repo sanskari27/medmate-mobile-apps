@@ -8,12 +8,14 @@ import { addressFixture } from '../../../test/address-fixture';
 import { idleAddressApi, idleAuthApi, renderWithStore, signedOutState } from '../../../test/render';
 import { sessionFixture } from '../../../test/session-fixture';
 import { splashFadeMs } from '../splash/SplashScreen/SplashScreen';
+import { signOut } from '../../features/auth/store/auth.slice';
 import {
   loginHeading,
   otpHeading,
   termsAgree,
   termsHeadingAccent,
 } from '../../features/auth/utils/copy';
+import { deliveryWindow } from '../../features/home/utils/copy';
 import {
   addAddressLabel,
   addressHeadingAccent,
@@ -99,9 +101,11 @@ describe('RootNavigator', () => {
       await Promise.resolve();
     });
     fireEvent.press(view.getByLabelText(saveAndDeliver));
-    expect(await view.findByText('Your account')).toBeTruthy();
+    expect(await view.findByText(deliveryWindow)).toBeTruthy();
 
-    fireEvent.press(view.getByLabelText('Sign out'));
+    await act(async () => {
+      await view.store.dispatch(signOut());
+    });
     expect(await view.findByText(loginHeading)).toBeTruthy();
   });
 
@@ -121,10 +125,10 @@ describe('RootNavigator', () => {
     expect(await view.findByText(termsHeadingAccent)).toBeTruthy();
     fireEvent.press(view.getByLabelText(termsAgree));
     expect(await view.findByText(addressHeadingAccent)).toBeTruthy();
-    expect(view.queryByText('Your account')).toBeNull();
+    expect(view.queryByText(deliveryWindow)).toBeNull();
 
     fireEvent.press(view.getByLabelText(deliverTo(labelHome)));
-    expect(await view.findByText('Your account')).toBeTruthy();
+    expect(await view.findByText(deliveryWindow)).toBeTruthy();
   });
 
   it('opens the account when a saved session still refreshes', async () => {
@@ -137,9 +141,10 @@ describe('RootNavigator', () => {
         list: jest.fn(async () => [addressFixture({ selected: true })]),
       }),
     });
-    expect(await view.findByText('Your account')).toBeTruthy();
-    expect(view.getByText('+919876543210')).toBeTruthy();
-    fireEvent.press(view.getByLabelText('Sign out'));
+    expect(await view.findByText(deliveryWindow)).toBeTruthy();
+    await act(async () => {
+      await view.store.dispatch(signOut());
+    });
     expect(await view.findByText(loginHeading)).toBeTruthy();
   });
 

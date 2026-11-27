@@ -6,6 +6,8 @@ import { Provider } from 'react-redux';
 import type { AddressApi } from '../src/features/address/api/address.api';
 import { initialAddressState } from '../src/features/address/store/address.slice';
 import type { AuthApi } from '../src/features/auth/api/auth.api';
+import type { HomeApi } from '../src/features/home/api/home.api';
+import { initialHomeState } from '../src/features/home/store/home.slice';
 import {
   initialAuthState,
   type AppExtra,
@@ -42,18 +44,28 @@ export function idleAddressApi(overrides: Partial<AddressApi> = {}): AddressApi 
   };
 }
 
+export function idleHomeApi(overrides: Partial<HomeApi> = {}): HomeApi {
+  return {
+    listSections: jest.fn(async () => []),
+    listNearby: jest.fn(async () => []),
+    ...overrides,
+  };
+}
+
 export function testExtra(
   authApi: AuthApi,
   sessionStore: SessionStore,
   addressApi: AddressApi = idleAddressApi(),
+  homeApi: HomeApi = idleHomeApi(),
 ): AppExtra {
-  return { authApi, sessionStore, addressApi };
+  return { authApi, sessionStore, addressApi, homeApi };
 }
 
 export function signedOutState(phone = ''): RootState {
   return {
     auth: { ...initialAuthState, status: 'signedOut', phone },
     address: initialAddressState,
+    home: initialHomeState,
   };
 }
 
@@ -67,6 +79,7 @@ export function signedInState(phone = '9876543210'): RootState {
       session: sessionFixture(),
     },
     address: initialAddressState,
+    home: initialHomeState,
   };
 }
 
@@ -75,6 +88,7 @@ export function renderWithStore(
   options?: {
     authApi?: AuthApi;
     addressApi?: AddressApi;
+    homeApi?: HomeApi;
     sessionStore?: SessionStore;
     preloadedState?: RootState;
     renderOptions?: RenderOptions;
@@ -83,8 +97,9 @@ export function renderWithStore(
   const sessionStore = options?.sessionStore ?? createMemorySessionStore();
   const authApi = options?.authApi ?? idleAuthApi();
   const addressApi = options?.addressApi ?? idleAddressApi();
+  const homeApi = options?.homeApi ?? idleHomeApi();
   const store = createAppStore(
-    testExtra(authApi, sessionStore, addressApi),
+    testExtra(authApi, sessionStore, addressApi, homeApi),
     options?.preloadedState,
   );
   const view = render(
@@ -93,7 +108,7 @@ export function renderWithStore(
     </SafeAreaProvider>,
     options?.renderOptions,
   );
-  return { store, authApi, addressApi, sessionStore, ...view };
+  return { store, authApi, addressApi, homeApi, sessionStore, ...view };
 }
 
 export function storeWrapper(store: AppStore) {

@@ -71,7 +71,11 @@ export const chooseAddress = createAsyncThunk<Address, string, ThunkConfig>(
 const addressSlice = createSlice({
   name: 'address',
   initialState: initialAddressState,
-  reducers: {},
+  reducers: {
+    reopenAddressPicker(state) {
+      state.awaitingPick = true;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(loadAddresses.pending, (state) => {
@@ -119,4 +123,5 @@ function upsert(items: Address[], next: Address): Address[] {
   return [next, ...cleared];
 }
 
+export const { reopenAddressPicker } = addressSlice.actions;
 export const addressReducer = addressSlice.reducer;

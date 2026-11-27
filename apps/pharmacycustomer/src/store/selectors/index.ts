@@ -13,3 +13,9 @@ export {
   selectAwaitingAddressPick,
   selectSelectedAddress,
 } from './address.selectors';
+export {
+  selectHomeError,
+  selectHomePharmacies,
+  selectHomeSections,
+  selectHomeStatus,
+} from './home.selectors';

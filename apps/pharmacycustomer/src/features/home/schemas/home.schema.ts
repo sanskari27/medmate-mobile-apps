@@ -1,0 +1,78 @@
+import { isRecord } from '../../../utils/record';
+import type { AppSection, NearbyPharmacy, SectionImage } from '../types/home';
+
+const rejected = 'Home could not be read';
+
+export function parseAppSections(payload: unknown): AppSection[] {
+  if (!isRecord(payload) || !Array.isArray(payload.sections)) throw new Error(rejected);
+  return payload.sections.map(readSection);
+}
+
+export function parseNearbyPharmacies(payload: unknown): NearbyPharmacy[] {
+  if (!isRecord(payload) || !Array.isArray(payload.pharmacies)) throw new Error(rejected);
+  return payload.pharmacies.map(readPharmacy);
+}
+
+function readSection(value: unknown): AppSection {
+  if (!isRecord(value)) throw new Error(rejected);
+  return {
+    id: readString(value, 'id'),
+    category: readString(value, 'category'),
+    position: readPosition(value.position),
+    image: readImage(value.image),
+  };
+}
+
+function readImage(value: unknown): SectionImage {
+  if (!isRecord(value)) throw new Error(rejected);
+  return {
+    contentType: readString(value, 'contentType'),
+    url: readString(value, 'url'),
+  };
+}
+
+function readPharmacy(value: unknown): NearbyPharmacy {
+  if (!isRecord(value)) throw new Error(rejected);
+  return {
+    pharmacyId: readString(value, 'pharmacyId'),
+    name: readOptionalString(value, 'name'),
+    address: readOptionalString(value, 'address'),
+    city: readOptionalString(value, 'city'),
+    state: readOptionalString(value, 'state'),
+    pincode: readOptionalString(value, 'pincode'),
+    latitude: readNumber(value, 'latitude'),
+    longitude: readNumber(value, 'longitude'),
+    distanceKm: readNumber(value, 'distanceKm'),
+    acceptOnlineOrders: readBoolean(value, 'acceptOnlineOrders'),
+  };
+}
+
+function readString(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  if (typeof value !== 'string' || value.length === 0) throw new Error(rejected);
+  return value;
+}
+
+function readOptionalString(record: Record<string, unknown>, key: string): string | null {
+  const value = record[key];
+  if (value === null) return null;
+  if (typeof value !== 'string') throw new Error(rejected);
+  return value;
+}
+
+function readPosition(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) throw new Error(rejected);
+  return value;
+}
+
+function readNumber(record: Record<string, unknown>, key: string): number {
+  const value = record[key];
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error(rejected);
+  return value;
+}
+
+function readBoolean(record: Record<string, unknown>, key: string): boolean {
+  const value = record[key];
+  if (typeof value !== 'boolean') throw new Error(rejected);
+  return value;
+}
