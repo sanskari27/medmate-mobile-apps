@@ -32,6 +32,7 @@ function accountFrom(
     id,
     accountType,
     phone,
+    email: asStringOrNull(account.email),
     displayName: asStringOrNull(account.displayName),
     pharmacyId: asStringOrNull(account.pharmacyId),
     pharmacyRole: asStringOrNull(account.pharmacyRole),

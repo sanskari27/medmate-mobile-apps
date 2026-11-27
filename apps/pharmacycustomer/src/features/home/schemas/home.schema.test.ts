@@ -1,4 +1,4 @@
-import { parseAppSections, parseNearbyPharmacies } from './home.schema';
+import { parseAppSections, parseCoupons, parseNearbyPharmacies, parseWallet } from './home.schema';
 
 const rejected = 'Home could not be read';
 
@@ -118,5 +118,100 @@ describe('home schema', () => {
     expect(() =>
       parseNearbyPharmacies({ pharmacies: [pharmacy({ acceptOnlineOrders: 'yes' })] }),
     ).toThrow(rejected);
+
+    expect(
+      parseCoupons({
+        coupons: [
+          {
+            id: 'coupon-1',
+            title: 'Flat 25% off',
+            code: 'SAVE25',
+            active: true,
+            banner: { contentType: 'image/png', url: 'https://cdn.example/save.png' },
+          },
+          {
+            id: 'coupon-2',
+            title: 'Paused',
+            code: 'OFF',
+            active: false,
+            banner: { contentType: 'image/png', url: 'https://cdn.example/off.png' },
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        id: 'coupon-1',
+        title: 'Flat 25% off',
+        code: 'SAVE25',
+        banner: { contentType: 'image/png', url: 'https://cdn.example/save.png' },
+      },
+    ]);
+    expect(() => parseCoupons(null)).toThrow(rejected);
+    expect(() => parseCoupons({ coupons: 'nope' })).toThrow(rejected);
+    expect(() => parseCoupons({ coupons: [null] })).toThrow(rejected);
+    expect(() => parseCoupons({ coupons: [{ active: 'yes' }] })).toThrow(rejected);
+    expect(() =>
+      parseCoupons({
+        coupons: [
+          {
+            id: '',
+            title: 'Flat 25% off',
+            code: 'SAVE25',
+            active: true,
+            banner: { contentType: 'image/png', url: 'https://cdn.example/save.png' },
+          },
+        ],
+      }),
+    ).toThrow(rejected);
+    expect(() =>
+      parseCoupons({
+        coupons: [
+          {
+            id: 'coupon-1',
+            title: 'Flat 25% off',
+            code: 'SAVE25',
+            active: true,
+            banner: null,
+          },
+        ],
+      }),
+    ).toThrow(rejected);
+    expect(() =>
+      parseCoupons({
+        coupons: [
+          {
+            id: 'coupon-1',
+            title: 'Flat 25% off',
+            code: 'SAVE25',
+            active: true,
+            banner: { contentType: 'image/png', url: '' },
+          },
+        ],
+      }),
+    ).toThrow(rejected);
+
+    expect(parseWallet({ balance: 15, referralCode: 'ABCD2345', referrerCode: 'FRIEND' })).toEqual({
+      balance: 15,
+      referralCode: 'ABCD2345',
+      referrerCode: 'FRIEND',
+    });
+    expect(parseWallet({ balance: 0, referralCode: 'ABCD2345', referrerCode: null })).toEqual({
+      balance: 0,
+      referralCode: 'ABCD2345',
+      referrerCode: null,
+    });
+    expect(() => parseWallet(null)).toThrow(rejected);
+    expect(() =>
+      parseWallet({ balance: '15', referralCode: 'ABCD2345', referrerCode: null }),
+    ).toThrow(rejected);
+    expect(() =>
+      parseWallet({ balance: 1.5, referralCode: 'ABCD2345', referrerCode: null }),
+    ).toThrow(rejected);
+    expect(() => parseWallet({ balance: 15, referralCode: '', referrerCode: null })).toThrow(
+      rejected,
+    );
+    expect(() => parseWallet({ balance: 15, referralCode: 'ABCD2345', referrerCode: 1 })).toThrow(
+      rejected,
+    );
   });
 });

@@ -4,6 +4,7 @@ const account = {
   id: 'id-1',
   accountType: 'customer',
   phone: '+919876543210',
+  email: 'ada@medmate.in',
   displayName: 'Ada',
   pharmacyId: null,
   pharmacyRole: null,
@@ -32,6 +33,7 @@ describe('parseSession', () => {
       expiresIn: 900,
       account: {
         id: 'id-1',
+        email: 'ada@medmate.in',
         displayName: 'Ada',
         subtypes: ['customer'],
         permissions: ['orders'],
@@ -44,6 +46,7 @@ describe('parseSession', () => {
         raw(
           {},
           {
+            email: null,
             displayName: null,
             subtypes: undefined,
             permissions: 'nope',
@@ -53,6 +56,7 @@ describe('parseSession', () => {
         ),
       ).account,
     ).toMatchObject({
+      email: null,
       displayName: null,
       subtypes: [],
       permissions: [],

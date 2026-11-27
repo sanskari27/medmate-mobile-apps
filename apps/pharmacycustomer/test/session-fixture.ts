@@ -9,6 +9,7 @@ export function sessionFixture(accessToken = 'access'): Session {
       id: 'account-1',
       accountType: 'customer',
       phone: '+919876543210',
+      email: null,
       displayName: null,
       pharmacyId: null,
       pharmacyRole: null,

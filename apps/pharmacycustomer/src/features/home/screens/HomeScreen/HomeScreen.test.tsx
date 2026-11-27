@@ -2,29 +2,42 @@ import { fireEvent } from '@testing-library/react-native';
 
 import { addressFixture } from '../../../../../test/address-fixture';
 import { idleHomeApi, renderWithStore, signedInState } from '../../../../../test/render';
+import { sessionFixture } from '../../../../../test/session-fixture';
 import { initialAddressState } from '../../../address/store/address.slice';
 import { deliverTo, labelHome } from '../../../address/utils/copy';
 import type { RootState } from '../../../../store/root.reducer';
-import type { AppSection, NearbyPharmacy } from '../../types/home';
+import type { AppSection, HomeCoupon, NearbyPharmacy } from '../../types/home';
 import type { HomeStatus } from '../../store/home.slice';
 import {
   chooseAddress,
   deliveryWindow,
   homeFailed,
   homeLoading,
+  pharmaciesAccent,
   pharmaciesEmpty,
   pharmaciesTitle,
   profileLabel,
+  placeSummary,
+  profileMark,
+  rupee,
   searchLabel,
+  sourceTitle,
   tryAgain,
 } from '../../utils/copy';
-import { failureCopy, homeBody, HomeScreen } from './HomeScreen';
+import { failureCopy, headerEmail, homeBody, HomeScreen } from './HomeScreen';
 
 const section: AppSection = {
   id: 'section-1',
   category: 'Pain',
   position: 0,
   image: { contentType: 'image/jpeg', url: 'https://cdn.example/pain.jpg' },
+};
+
+const coupon: HomeCoupon = {
+  id: 'coupon-1',
+  title: 'Flat 25% off',
+  code: 'SAVE25',
+  banner: { contentType: 'image/png', url: 'https://cdn.example/save.png' },
 };
 
 const pharmacy: NearbyPharmacy = {
@@ -66,23 +79,33 @@ describe('HomeScreen', () => {
     expect(homeBody(true, 'loading')).toBe('loading');
     expect(failureCopy(null)).toBe(homeFailed);
     expect(failureCopy('offline')).toBe('offline');
+    expect(headerEmail(null)).toBeNull();
+    const named = sessionFixture();
+    expect(headerEmail(named)).toBeNull();
+    named.account.email = 'ada@medmate.in';
+    expect(headerEmail(named)).toBe('ada@medmate.in');
   });
 
-  it('shows the header and opens the address picker before a delivery address is chosen', () => {
+  it('shows the header and opens the address picker before a delivery address is chosen', async () => {
     const homeApi = idleHomeApi();
     const view = renderWithStore(<HomeScreen />, {
       homeApi,
       preloadedState: signedInState(),
     });
     expect(view.getByText(deliveryWindow)).toBeTruthy();
-    expect(view.getByLabelText(chooseAddress)).toBeTruthy();
+    expect(await view.findByText(rupee(0))).toBeTruthy();
+    expect(view.getByText(profileMark)).toBeTruthy();
+    expect(view.getByText(sourceTitle)).toBeTruthy();
+    expect(view.getByText(placeSummary(chooseAddress, ''))).toBeTruthy();
     expect(view.queryByLabelText(homeLoading)).toBeNull();
     expect(view.queryByText(pharmaciesTitle)).toBeNull();
     fireEvent.press(view.getByLabelText(chooseAddress));
     expect(view.store.getState().address.awaitingPick).toBe(true);
     fireEvent.press(view.getByLabelText(searchLabel));
+    fireEvent.press(view.getByLabelText('Fever & pain'));
     fireEvent.press(view.getByLabelText(profileLabel));
     expect(homeApi.listSections).not.toHaveBeenCalled();
+    expect(homeApi.readWallet).toHaveBeenCalledWith('access');
   });
 
   it('shows category tiles and pharmacies for the selected address', async () => {
@@ -97,18 +120,20 @@ describe('HomeScreen', () => {
     const homeApi = idleHomeApi({
       listSections: jest.fn(() => sections),
       listNearby: jest.fn(() => pharmacies),
+      listCoupons: jest.fn(async () => [coupon]),
     });
     const view = renderWithStore(<HomeScreen />, {
       homeApi,
       preloadedState: withAddress(),
     });
     expect(view.getByLabelText(deliverTo(labelHome))).toBeTruthy();
-    expect(view.getByText('Flat 302, Sri Sai Residency')).toBeTruthy();
+    expect(view.getByText(placeSummary(labelHome, 'Flat 302, Sri Sai Residency'))).toBeTruthy();
     expect(view.getByLabelText(homeLoading)).toBeTruthy();
 
     releaseSections([section]);
     releasePharmacies([pharmacy]);
     expect(await view.findByLabelText('Pain')).toBeTruthy();
+    expect(view.getByLabelText(coupon.title)).toBeTruthy();
     expect(view.getByLabelText('Apollo')).toBeTruthy();
     fireEvent.press(view.getByLabelText('Pain'));
     fireEvent.press(view.getByLabelText('Apollo'));
@@ -128,7 +153,25 @@ describe('HomeScreen', () => {
     expect(await view.findByText('offline')).toBeTruthy();
     fireEvent.press(view.getByLabelText(tryAgain));
     expect(await view.findByText(pharmaciesTitle)).toBeTruthy();
+    expect(view.getByText(pharmaciesAccent)).toBeTruthy();
     expect(view.getByText(pharmaciesEmpty)).toBeTruthy();
     expect(view.queryByLabelText('Pain')).toBeNull();
+  });
+
+  it('shows the profile initial from the account email and the wallet balance', async () => {
+    const state = signedInState();
+    const session = sessionFixture();
+    session.account.email = 'ada@medmate.in';
+    state.auth.session = session;
+    const homeApi = idleHomeApi({
+      readWallet: jest.fn(async () => ({
+        balance: 15,
+        referralCode: 'ABCD2345',
+        referrerCode: 'FRIEND',
+      })),
+    });
+    const view = renderWithStore(<HomeScreen />, { homeApi, preloadedState: state });
+    expect(view.getByText('A')).toBeTruthy();
+    expect(await view.findByText(rupee(15))).toBeTruthy();
   });
 });

@@ -2,6 +2,7 @@ export type Account = {
   id: string;
   accountType: string;
   phone: string;
+  email: string | null;
   displayName: string | null;
   pharmacyId: string | null;
   pharmacyRole: string | null;

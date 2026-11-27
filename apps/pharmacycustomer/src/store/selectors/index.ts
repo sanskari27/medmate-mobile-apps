@@ -15,6 +15,8 @@ export {
 } from './address.selectors';
 export {
   selectHomeError,
+  selectHomeBalance,
+  selectHomeCoupons,
   selectHomePharmacies,
   selectHomeSections,
   selectHomeStatus,

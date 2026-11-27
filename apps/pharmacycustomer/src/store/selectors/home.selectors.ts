@@ -12,6 +12,14 @@ export function selectHomePharmacies(state: RootState) {
   return state.home.pharmacies;
 }
 
+export function selectHomeCoupons(state: RootState) {
+  return state.home.coupons;
+}
+
+export function selectHomeBalance(state: RootState) {
+  return state.home.balance;
+}
+
 export function selectHomeError(state: RootState) {
   return state.home.error;
 }

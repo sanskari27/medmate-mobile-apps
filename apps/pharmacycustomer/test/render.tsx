@@ -48,6 +48,8 @@ export function idleHomeApi(overrides: Partial<HomeApi> = {}): HomeApi {
   return {
     listSections: jest.fn(async () => []),
     listNearby: jest.fn(async () => []),
+    listCoupons: jest.fn(async () => []),
+    readWallet: jest.fn(async () => ({ balance: 0, referralCode: 'ABCD2345', referrerCode: null })),
     ...overrides,
   };
 }

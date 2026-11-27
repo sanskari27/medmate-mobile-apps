@@ -10,14 +10,21 @@ import {
 } from '../../../../test/render';
 import { initialAddressState } from '../../address/store/address.slice';
 import { signOut, verifyOtp } from '../../auth/store/auth.slice';
-import type { AppSection, NearbyPharmacy } from '../types/home';
-import { initialHomeState, loadHome } from './home.slice';
+import type { AppSection, HomeCoupon, NearbyPharmacy } from '../types/home';
+import { initialHomeState, loadHome, loadWallet } from './home.slice';
 
 const section: AppSection = {
   id: 'section-1',
   category: 'Pain',
   position: 0,
   image: { contentType: 'image/jpeg', url: 'https://cdn.example/pain.jpg' },
+};
+
+const coupon: HomeCoupon = {
+  id: 'coupon-1',
+  title: 'Flat 25% off',
+  code: 'SAVE25',
+  banner: { contentType: 'image/png', url: 'https://cdn.example/save.png' },
 };
 
 const pharmacy: NearbyPharmacy = {
@@ -49,9 +56,11 @@ function readyAddress() {
 
 describe('home slice', () => {
   it('loads sections and pharmacies for the selected address', async () => {
+    const listCoupons = jest.fn(async () => [coupon]);
     const homeApi = idleHomeApi({
       listSections: jest.fn(async () => [section]),
       listNearby: jest.fn(async () => [pharmacy]),
+      listCoupons,
     });
     const store = createAppStore(
       testExtra(idleAuthApi(), createMemorySessionStore(), undefined, homeApi),
@@ -61,12 +70,19 @@ describe('home slice', () => {
     await store.dispatch(loadHome());
     expect(homeApi.listSections).toHaveBeenCalledWith('access');
     expect(homeApi.listNearby).toHaveBeenCalledWith('access', 12.9716, 77.5946);
+    expect(listCoupons).toHaveBeenCalledWith('access');
     expect(store.getState().home).toEqual({
       status: 'ready',
       sections: [section],
       pharmacies: [pharmacy],
+      coupons: [coupon],
+      balance: null,
       error: null,
     });
+    listCoupons.mockRejectedValueOnce(new Error('forbidden'));
+    await store.dispatch(loadHome());
+    expect(store.getState().home.status).toBe('ready');
+    expect(store.getState().home.coupons).toEqual([]);
 
     await store.dispatch(verifyOtp('123456'));
     expect(store.getState().home).toEqual(initialHomeState);
@@ -112,5 +128,35 @@ describe('home slice', () => {
     });
     await unselected.dispatch(loadHome());
     expect(unselected.getState().home.error).toBe('A delivery address is required');
+  });
+
+  it('stores the wallet balance and clears it when the read fails', async () => {
+    const readWallet = jest.fn(async () => ({
+      balance: 15,
+      referralCode: 'ABCD2345',
+      referrerCode: null,
+    }));
+    const homeApi = idleHomeApi({ readWallet });
+    const store = createAppStore(
+      testExtra(idleAuthApi(), createMemorySessionStore(), undefined, homeApi),
+      readyAddress(),
+    );
+
+    await store.dispatch(loadWallet());
+    expect(readWallet).toHaveBeenCalledWith('access');
+    expect(store.getState().home.balance).toBe(15);
+    await store.dispatch(loadHome());
+    expect(store.getState().home.balance).toBe(15);
+
+    readWallet.mockRejectedValueOnce(new Error('forbidden'));
+    await store.dispatch(loadWallet());
+    expect(store.getState().home.balance).toBeNull();
+
+    const signedOut = createAppStore(
+      testExtra(idleAuthApi(), createMemorySessionStore()),
+      signedOutState(),
+    );
+    await signedOut.dispatch(loadWallet());
+    expect(signedOut.getState().home.balance).toBeNull();
   });
 });
